@@ -1,0 +1,31 @@
+A vállalati környezetre vonatkozó kiegészítés
+A szakdolgozatban érdemes megemlíteni, hogy bár a PostgreSQL sok esetben ideális választás, egyes vállalati környezetekben, ahol speciális, nagy teljesítményű és méretezhető adatbázisokra van szükség, gyakran választják a Microsoft SQL Server vagy az Oracle adatbázisokat. Ennek oka, hogy ezek a rendszerek nagyvállalati szintű funkcionalitással bírnak, és olyan szolgáltatásokat nyújtanak, mint például:
+
+Skálázhatóság: Jobban kezelik a nagyvállalati szintű, magas terhelést jelentő alkalmazásokat.
+Fejlett biztonsági és jogosultságkezelés: A nagyobb szervezeteknél különösen fontos a hozzáférési jogosultságok részletes szabályozása, amit ezek az adatbázisok részletesen támogatnak.
+Összetett tranzakciókezelés és adatkonzisztencia: Ezek a rendszerek bonyolult tranzakciókat, replikációt és failover mechanizmusokat kínálnak, amelyek nagyban hozzájárulnak a rendszerek megbízhatóságához és folyamatos rendelkezésre állásához.
+Azt is megjegyezheted, hogy bár PostgreSQL is kiválóan skálázható és megbízható, a Microsoft SQL Server és az Oracle gyakran preferált választás azokban az esetekben, amikor egy szervezet már egy szélesebb Microsoft vagy Oracle ökoszisztémát használ.
+
+Ez az összehasonlítás bemutatja, hogy a PostgreSQL remek választás egy fejlett tudásbázis számára, de az alternatívák is erős lehetőségek, különösen nagyvállalati alkalmazásoknál.
+
+
+Szakdolgozati követelmények
+Kedves Hallgatók!
+
+A Kar a záróvizsgázó hallgatók számára körbeküldött egy ajánlott sablont. A sablontól függetlenül, az Informatikai Intézet által kezelt szakokra az intézet formai követelményei érvényesek a szakdolgozatokra.
+
+A Kari sablon is használható a szakdolgozatok elkészítéséhez, azonban figyelni kell arra, hogy:
+
+- A BSc-s szakdolgozat legalább 25 oldal hosszúságú legyen (szemben a sablon minimum 20 oldalával)
+
+- A témavezető által megfogalmazott témakiírás mindenképp legyen benne a szakdolgozatban, az továbbbra is kötelező formai elem.
+
+A teljes formai követelményekre vonatkozó szabályzat elérhető itt:
+
+https://www.inf.u-szeged.hu/hallgatoknak/diplomamunka-szakdolgozat/szerkezeti-es-formai-kovetelmenyek
+
+A formai követelmények legfontosabb része:
+
+A dolgozat terjedelme mellékletek nélkül alapszakon 25-50 oldal mesterszakon 30-60 oldal.
+A dolgozat előírt terjedelmébe a következő részek számolandók bele: d) tartalmi összefoglaló, e) tartalomjegyzék, f) érdemi rész, g) irodalomjegyzék.
+A dolgozat kötelező formai elemei: b) címoldal, c) feladatkiírás, d) tartalmi összefoglaló, e) tartalomjegyzék, f) érdemi rész, g) irodalomjegyzék, h) nyilatkozat. (A kötelező formai elemek egyike sem lehet üres.)
