@@ -1,26 +1,35 @@
 <template>
-  <div id="app">
-      <h1>Vue és Express Tudásbázis</h1>
-      <p>{{ message }}</p>
-  </div>
-</template>
-
-<script>
-import api from './api';
-
-export default {
-  data() {
-      return {
-          message: 'Kapcsolódás tesztelése...',
-      };
-  },
-  async created() {
-      try {
-          const response = await api.get('/test');
-          this.message = response.data.message;
-      } catch (error) {
-          this.message = 'Hiba az API elérésében';
-      }
-  },
-};
-</script>
+    <div id="app">
+      <Home />
+    </div>
+  </template>
+  
+  <script>
+  import Home from './views/FooldalOldal.vue';
+  
+  export default {
+    components: {
+      Home,
+    },
+  };
+  </script>
+  
+  <style>
+  /* Globális stílusok */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f7f7f7;
+    color: #333;
+  }
+  
+  h1, h2, p {
+    color: #333;
+  }
+  </style>
+  
