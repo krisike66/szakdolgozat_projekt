@@ -1,6 +1,13 @@
 <template>
   <div class="home">
+    <!-- Menüsor komponens, ami tartalmazhat navigációs elemeket -->
     <MenusorKomponens />
+
+    <!-- Kijelentkezés gomb -->
+    <div class="logout-container">
+      <button class="logout-btn" @click="logout">Kijelentkezés</button>
+    </div>
+
     <header class="hero">
       <h1>Üdvözöljük a Tudásbázisban!</h1>
       <p>Fedezze fel a szervezet tudásanyagait, és találja meg a szükséges információkat gyorsan!</p>
@@ -41,6 +48,14 @@ export default {
     LablecKomponens,
     KeresoKomponens,
   },
+  methods: {
+    logout() {
+      // Töröljük a jwt sütit (vagy bármi más, amin a bejelentkezési állapotot tartjuk)
+      document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      // Átirányítás a bejelentkezési oldalra (győződj meg róla, hogy a router megfelelően van beállítva)
+      this.$router.push('/login');
+    }
+  }
 };
 </script>
 
@@ -49,14 +64,15 @@ export default {
   background-color: #f5f5f5;
   padding: 40px 20px;
   color: #333;
-  text-align: center; /* Minden szöveget középre igazít */
+  text-align: center;
 }
 
 h1 {
   font-size: 2.2em;
   margin-bottom: 0.2em;
 }
-h2{
+
+h2 {
   margin: 20px;
 }
 
@@ -91,5 +107,29 @@ p {
 .card:hover {
   transform: translateY(-5px);
   box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Stílus a kijelentkezés gombnak */
+.logout-container {
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px 20px;
+  background-color: #ffffff;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.logout-btn {
+  background-color: #dc3545;
+  border: none;
+  padding: 10px 20px;
+  color: #ffffff;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background-color 0.3s;
+}
+
+.logout-btn:hover {
+  background-color: #c82333;
 }
 </style>

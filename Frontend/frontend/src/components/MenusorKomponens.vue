@@ -1,7 +1,7 @@
 <template>
     <nav class="navbar">
       <ul class="menu">
-        <li class="menu-item"><a href="/">Főoldal</a></li>
+        <li class="menu-item"><a href="/home">Főoldal</a></li>
         <li class="menu-item"><a href="/tudasanyagok">Tudásanyagok</a></li>
         <li class="menu-item"><a href="/kereses">Keresés</a></li>
         <li class="menu-item"><a href="/profil">Profil</a></li>
