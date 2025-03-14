@@ -1,76 +1,77 @@
 <template>
-    <nav class="navbar">
-      <ul class="menu">
-        <li class="menu-item"><a href="/home">Főoldal</a></li>
-        <li class="menu-item"><a href="/tudasanyagok">Tudásanyagok</a></li>
-        <li class="menu-item"><a href="/kereses">Keresés</a></li>
-        <li class="menu-item"><a href="/profil">Profil</a></li>
-      </ul>
-    </nav>
-  </template>
-  
-  <script>
-  export default {
-    name: 'MenusorKomponens',
-  };
-  </script>
-  
-  <style scoped>
-  .navbar {
-    display: flex;
-    justify-content: center;
-    background-color: #1e1e1e;
-    padding: 1em;
+  <nav class="menusor">
+    <ul class="menu">
+      <li><router-link to="/home">Főoldal</router-link></li>
+      <li><router-link to="/profile">Profil</router-link></li>
+      <li><router-link to="/tudasanyagok">Tudásanyagok</router-link></li>
+    </ul>
+    <div class="logout-container">
+      <button class="logout-btn" @click="logout">Kijelentkezés</button>
+    </div>
+  </nav>
+</template>
+
+<script>
+export default {
+  name: 'MenusorKomponens',
+  methods: {
+    logout() {
+      // Töröljük a JWT sütit és átirányítunk a bejelentkezési oldalra
+      document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      this.$router.push('/login');
+    }
   }
-  
-  .menu {
-    display: flex;
-    gap: 15px;
-    padding: 0;
-    margin: 0;
-    list-style: none;
-  }
-  
-  .menu-item {
-    position: relative;
-    overflow: hidden;
-    border-radius: 8px;
-    transition: transform 0.3s;
-  }
-  
-  .menu-item a {
-    display: block;
-    padding: 0.8em 1.5em;
-    color: #ddd;
-    font-size: 1em;
-    font-weight: 500;
-    text-transform: uppercase;
-    text-decoration: none;
-    transition: color 0.3s;
-  }
-  
-  .menu-item a::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, #505758, #381f1f);
-    transition: left 0.3s;
-    z-index: -1;
-  }
-  
-  .menu-item:hover {
-    transform: scale(1.05);
-  }
-  
-  .menu-item a:hover::before {
-    left: 0;
-  }
-  
-  .menu-item a:hover {
-    color: #f0f0f0;
-  }
-  </style>
-  
+};
+</script>
+
+<style scoped>
+.menusor {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #222;
+  padding: 10px 20px;
+  color: #fff;
+}
+
+.menu {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+  margin: 0;
+  padding: 0;
+}
+
+.menu li {
+  font-size: 1em;
+}
+
+.menu li a {
+  color: #fff;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.menu li a:hover {
+  color: #f1c40f;
+}
+
+.logout-container {
+  /* Biztosítja, hogy a kijelentkezés gomb megfelelően igazodik */
+}
+
+.logout-btn {
+  background: transparent;
+  border: 1px solid #f1c40f;
+  color: #f1c40f;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.logout-btn:hover {
+  background-color: #f1c40f;
+  color: #222;
+}
+</style>

@@ -3,10 +3,6 @@
     <!-- Menüsor komponens, ami tartalmazhat navigációs elemeket -->
     <MenusorKomponens />
 
-    <!-- Kijelentkezés gomb -->
-    <div class="logout-container">
-      <button class="logout-btn" @click="logout">Kijelentkezés</button>
-    </div>
 
     <header class="hero">
       <h1>Üdvözöljük a Tudásbázisban!</h1>

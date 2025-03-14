@@ -1,18 +1,22 @@
 <template>
-  <div class="login-container">
-    <div class="login-card">
-      <h2>Bejelentkezés</h2>
-      <form @submit.prevent="onSubmit">
-        <div class="form-group">
-          <input v-model="email" type="email" placeholder="Email" required />
-        </div>
-        <div class="form-group">
-          <input v-model="password" type="password" placeholder="Jelszó" required />
-        </div>
-        <button type="submit">Bejelentkezés</button>
-      </form>
+  <div class="login-page">
+    <h2>Bejelentkezés</h2>
+    <form @submit.prevent="onSubmit">
+      <input v-model="email" type="email" placeholder="Email" required />
+      
+      <div class="password-wrapper">
+        <input :type="showPassword ? 'text' : 'password'" v-model="password" placeholder="Jelszó" required />
+        <button type="button" class="toggle-btn" @click="togglePassword">
+          {{ showPassword ? 'Elrejt' : 'Mutat' }}
+        </button>
+      </div>
+      
+      <button type="submit" :disabled="loading">
+        {{ loading ? 'Betöltés...' : 'Bejelentkezés' }}
+      </button>
+      
       <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
-    </div>
+    </form>
   </div>
 </template>
 
@@ -20,91 +24,119 @@
 import api from '../api';
 
 export default {
-  name: 'LoginView',
   data() {
     return {
       email: '',
       password: '',
-      errorMessage: ''
+      showPassword: false,
+      errorMessage: '',
+      loading: false
     };
   },
   methods: {
-    onSubmit() {
-      api.post('/login', { email: this.email, password: this.password })
-        .then(response => {
-          console.log('Bejelentkezés sikeres', response.data);
-          // Sikeres bejelentkezés után irányítsd át a felhasználót a főoldalra:
-          this.$router.push('/home');
-        })
-        .catch(error => {
-          console.error('Hiba történt a bejelentkezés során.', error);
-          this.errorMessage = 'Hiba történt a bejelentkezés során.';
+    togglePassword() {
+      this.showPassword = !this.showPassword;
+    },
+    async onSubmit() {
+      this.errorMessage = '';
+      this.loading = true;
+      try {
+        const response = await api.post('/users/login', {
+          email: this.email,
+          password: this.password
         });
+        console.log('Bejelentkezés sikeres:', response.data);
+        // Token tárolása, ha szükséges:
+        if (response.data.token) {
+          localStorage.setItem('userToken', response.data.token);
+        }
+        // Átirányítás a főoldalra:
+        this.$router.push('/home');
+      } catch (error) {
+        console.error('Bejelentkezési hiba:', error);
+        this.errorMessage = 'Hiba történt a bejelentkezés során. Kérjük, próbáld újra!';
+      } finally {
+        this.loading = false;
+      }
     }
   }
 };
 </script>
 
 <style scoped>
-/* Konténer a központi elhelyezkedéshez */
-.login-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background-color: #f4f6f8;
-}
-
-/* Kártya stílus a login űrlaphoz */
-.login-card {
-  background: #ffffff;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-  width: 100%;
+.login-page {
   max-width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #ffffff;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
-.login-card h2 {
+h2 {
   text-align: center;
-  margin-bottom: 1.5rem;
-  color: #333333;
+  margin-bottom: 20px;
 }
 
-/* Űrlap mezők stílusa */
-.form-group {
-  margin-bottom: 1rem;
+form {
+  display: flex;
+  flex-direction: column;
 }
 
-.form-group input {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #dddddd;
+input {
+  padding: 12px;
+  margin-bottom: 15px;
+  border: 1px solid #000000;
   border-radius: 4px;
-  font-size: 1rem;
+  font-size: 1em;
 }
 
-/* Gomb stílus */
-button[type="submit"] {
+.password-wrapper {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.password-wrapper input {
   width: 100%;
-  padding: 0.75rem;
-  background-color: #007BFF;
+  padding-right: 80px;
+}
+
+.toggle-btn {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  color: #363636;
+  cursor: pointer;
+  font-size: 0.9em;
+}
+
+button[type="submit"] {
+  padding: 12px;
+  background-color: #333;
+  color: #fff;
   border: none;
   border-radius: 4px;
-  color: #ffffff;
-  font-size: 1rem;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  font-size: 1em;
+  transition: background-color 0.3s;
 }
 
 button[type="submit"]:hover {
-  background-color: #0056b3;
+  background-color: #555;
 }
 
-/* Hibaüzenet stílus */
+button[disabled] {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
 .error {
   color: red;
-  margin-top: 1rem;
   text-align: center;
+  margin-top: 10px;
 }
 </style>

@@ -1,40 +1,131 @@
 <template>
-    <div class="profile-page">
-      <h1>Profilom</h1>
-      <div v-if="user">
-        <p><strong>Felhasználónév:</strong> {{ user.felhasznalonev || user.username }}</p>
-        <p><strong>Email:</strong> {{ user.email }}</p>
-        <p><strong>Szerepkör:</strong> {{ user.role }}</p>
-      </div>
-      <div v-else>
-        <p>Nincs elérhető felhasználói adat.</p>
+  <div class="profile-page">
+    <!-- Menüsor komponens a tetején -->
+    <MenusorKomponens />
+
+    <!-- Profil kártya konténer -->
+    <div class="profile-container">
+      <div class="profile-card">
+        <h1>Profilom</h1>
+        <div class="profile-info" v-if="user">
+          <p><strong>Felhasználónév:</strong> {{ user.felhasznalonev }}</p>
+          <p><strong>Email:</strong> {{ user.email }}</p>
+          <p><strong>Szerepkör:</strong> {{ user.role }}</p>
+        </div>
+        <div v-else-if="error">
+          <p class="error">{{ error }}</p>
+        </div>
+        <div v-else>
+          <p>Profil adatok betöltése...</p>
+        </div>
+        <button class="logout-btn" @click="logout">Kijelentkezés</button>
       </div>
     </div>
-  </template>
-  
-  <script>
-  export default {
-    name: "ProfileView",
-    data() {
-      return {
-        user: null,
-      };
+  </div>
+</template>
+
+<script>
+import MenusorKomponens from '../components/MenusorKomponens.vue';
+import api from '../api';
+
+export default {
+  name: 'ProfileView',
+  components: {
+    MenusorKomponens,
+  },
+  data() {
+    return {
+      user: null,
+      error: null,
+    };
+  },
+  created() {
+    this.fetchProfile();
+  },
+  methods: {
+    fetchProfile() {
+      api.get('/users/profile')
+        .then(response => {
+          this.user = response.data;
+        })
+        .catch(error => {
+          console.error("Profil betöltési hiba:", error);
+          this.error = "Nem sikerült betölteni a profil adatait.";
+        });
     },
-    mounted() {
-      // Olvasd ki a felhasználói adatokat a localStorage-ból, ha el vannak mentve
-      const storedUser = localStorage.getItem('user');
-      if (storedUser) {
-        this.user = JSON.parse(storedUser);
-      }
-    },
-  };
-  </script>
-  
-  <style scoped>
-  .profile-page {
-    max-width: 600px;
-    margin: 20px auto;
-    padding: 20px;
-  }
-  </style>
-  
+    logout() {
+      // Töröljük a jwt sütit és átirányítunk a bejelentkezési oldalra
+      document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      this.$router.push('/login');
+    }
+  },
+};
+</script>
+
+<style scoped>
+.profile-page {
+  background: #f7f7f7;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1;
+  padding: 20px;
+}
+
+.profile-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+  border: 1px solid #e0e0e0;
+}
+
+.profile-card h1 {
+  color: #333333;
+  margin-bottom: 20px;
+  font-size: 2em;
+  border-bottom: 2px solid #f1c40f;
+  padding-bottom: 10px;
+}
+
+.profile-info p {
+  font-size: 1.1em;
+  margin: 10px 0;
+  color: #555555;
+}
+
+.profile-info strong {
+  color: #000000;
+}
+
+.logout-btn {
+  margin-top: 20px;
+  background-color: #e74c3c;
+  border: none;
+  padding: 12px 20px;
+  color: #ffffff;
+  font-size: 1em;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.logout-btn:hover {
+  background-color: #c0392b;
+}
+
+.error {
+  color: #e74c3c;
+  font-weight: bold;
+  margin-top: 15px;
+}
+</style>
