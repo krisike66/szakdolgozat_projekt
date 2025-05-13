@@ -17,11 +17,16 @@ const createCimke = async (req, res) => {
 
 // Összes címke lekérése
 const getAllCimkek = async (req, res) => {
+  const { kategoria_id } = req.query;
+
   try {
-    const cimkek = await Cimke.findAll();
-    res.status(200).json(cimkek);
+    const whereClause = {};
+    if (kategoria_id) whereClause.kategoria_id = kategoria_id;
+
+    const cimkek = await Cimke.findAll({ where: whereClause });
+    res.json(cimkek);
   } catch (error) {
-    console.error('Címkék lekérési hiba:', error);
+    console.error('Hiba a címkék lekérésekor:', error);
     res.status(500).json({ error: 'Belső szerver hiba' });
   }
 };

@@ -64,12 +64,16 @@ export default {
 
 <style scoped>
 .tudasanyag-detail {
-  max-width: 800px;
-  margin: 20px auto;
-  padding: 20px;
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 30px;
+  background-color: #ffffff;
+  border-left: 6px solid #007bff;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  font-family: "Segoe UI", sans-serif;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .header {
@@ -77,7 +81,10 @@ export default {
 }
 
 .header h1 {
-  color: #343a40;
+  color: #222;
+  margin-bottom: 10px;
+  font-size: 2em;
+  word-break: break-word;
 }
 
 .header .meta {
@@ -92,15 +99,40 @@ export default {
   color: #343a40;
 }
 
+.content p {
+  font-size: 1.1em;
+  line-height: 1.6em;
+  color: #444;
+  margin-top: 20px;
+  white-space: pre-line;
+  word-break: break-word;
+}
+
+.cimkek {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cimke {
+  background-color: #007bff;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
 .back-btn {
   background-color: #007bff;
   color: #fff;
   border: none;
-  padding: 10px 15px;
-  border-radius: 4px;
+  padding: 8px 16px;
+  border-radius: 6px;
   cursor: pointer;
+  font-size: 0.9em;
+  transition: background-color 0.3s ease;
   margin-bottom: 20px;
-  transition: background-color 0.3s;
 }
 
 .back-btn:hover {

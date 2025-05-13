@@ -1,7 +1,7 @@
 <template>
   <div class="profile-page">
-    <!-- Profil kártya konténer -->
-    <div class="profile-container">
+    <div class="layout">
+      <!-- Profil kártya -->
       <div class="profile-card">
         <h1>Profilom</h1>
         <div class="profile-info" v-if="user">
@@ -17,6 +17,23 @@
         </div>
         <button class="logout-btn" @click="logout">Kijelentkezés</button>
       </div>
+
+      <!-- Tudásanyag lista -->
+      <div class="card-list-container">
+        <h2>Általam létrehozott tudásanyagok</h2>
+        <div
+          v-for="item in userTudasanyagok"
+          :key="item.tudasanyag_id"
+          class="card-box"
+          @click="goToDetail(item.tudasanyag_id)"
+        >
+          <div>
+            <h3>{{ item.cim }}</h3>
+            <p>{{ item.tartalom }}</p>
+            <small>{{ formatDate(item.modositva) }}</small>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -26,39 +43,58 @@ import api from '../api';
 
 export default {
   name: 'ProfileView',
-  components: {
-  },
   data() {
     return {
       user: null,
       error: null,
+      userTudasanyagok: []
     };
   },
   created() {
     this.fetchProfile();
+    this.fetchOwnTudasanyagok();
   },
   methods: {
     fetchProfile() {
-      const token = localStorage.getItem('userToken');  // Hozzáadjuk a token fejléchez
+      const token = localStorage.getItem('userToken');
       if (!token) {
         this.error = "Nincs érvényes bejelentkezés.";
         return;
       }
-
       api.get('/users/profile', {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+        headers: { Authorization: `Bearer ${token}` }
       })
-        .then(response => {
-          this.user = response.data;
-        })
-        .catch(error => {
-          console.error("Profil betöltési hiba:", error);
+        .then(response => { this.user = response.data; })
+        .catch(() => {
           this.error = "Nem sikerült betölteni a profil adatait.";
         });
     },
-}
+    fetchOwnTudasanyagok() {
+      const token = localStorage.getItem('userToken');
+      api.get('/tudasanyagok', {
+        headers: { Authorization: `Bearer ${token}` }
+      }).then(response => {
+        this.userTudasanyagok = response.data.filter(item => item.letrehozva_altala === this.user?.user_id);
+      }).catch(error => {
+        console.error("Tudásanyagok betöltése hiba:", error);
+      });
+    },
+    goToDetail(id) {
+      this.$router.push(`/tudasanyagok/${id}`);
+    },
+    formatDate(dateString) {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('hu-HU', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    },
+    logout() {
+      localStorage.removeItem('userToken');
+      this.$router.push('/login');
+    }
+  }
 };
 </script>
 
@@ -66,34 +102,33 @@ export default {
 .profile-page {
   background: #f7f7f7;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+  padding: 30px 20px;
 }
 
-.profile-container {
+.layout {
   display: flex;
+  flex-direction: row;
   justify-content: center;
-  align-items: center;
-  flex-grow: 1;
-  padding: 20px;
+  gap: 40px;
+  flex-wrap: wrap;
 }
 
 .profile-card {
   background: #ffffff;
   border-radius: 12px;
   padding: 30px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-  max-width: 500px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
+  max-width: 400px;
   width: 100%;
   text-align: center;
-  border: 1px solid #e0e0e0;
+  border-left: 6px solid #007bff;
 }
 
 .profile-card h1 {
   color: #333333;
   margin-bottom: 20px;
   font-size: 2em;
-  border-bottom: 2px solid #f1c40f;
+  border-bottom: 2px solid #007bff;
   padding-bottom: 10px;
 }
 
@@ -101,10 +136,6 @@ export default {
   font-size: 1.1em;
   margin: 10px 0;
   color: #555555;
-}
-
-.profile-info strong {
-  color: #000000;
 }
 
 .logout-btn {
@@ -123,9 +154,54 @@ export default {
   background-color: #c0392b;
 }
 
-.error {
-  color: #e74c3c;
-  font-weight: bold;
-  margin-top: 15px;
+.card-list-container {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  width: 100%;
+  max-width: 700px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  overflow-y: auto;
+  max-height: 650px;
+}
+
+.card-list-container h2 {
+  margin-bottom: 16px;
+  font-size: 1.5em;
+  color: #333;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 6px;
+}
+
+.card-box {
+  background-color: #fff;
+  border-left: 6px solid #007bff;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transition: all 0.2s ease-in-out;
+}
+
+.card-box:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+.card-box h3 {
+  font-size: 1.1em;
+  margin-bottom: 4px;
+  color: #222;
+}
+
+.card-box p {
+  color: #555;
+  font-size: 0.95em;
+}
+
+.card-box small {
+  color: #999;
+  font-size: 0.85em;
 }
 </style>

@@ -6,6 +6,7 @@ const db = require('./Models');
 const userRoutes = require('./Routes1/userRoutes');
 const tudasanyagRoutes = require('./Routes1/tudasanyagRoutes');
 const cimkeRoutes = require('./Routes1/cimkeRoutes');
+const kategoriakRoutes = require('./Routes1/kategoriakRoutes');
 require('dotenv').config();
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -30,5 +31,6 @@ db.sequelize.sync({ alter: true }).then(() => {
 app.use('/api/users', userRoutes);
 app.use('/api/tudasanyagok', tudasanyagRoutes);
 app.use('/api/cimkek', cimkeRoutes);
+app.use('/api/kategoriak', kategoriakRoutes);
 
 app.listen(PORT, () => console.log(`Server is connected on ${PORT}`));

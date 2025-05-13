@@ -10,6 +10,10 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false,
         },
+        kategoria_id: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+        },
     }, {
         tableName: 'cimkek',
         timestamps: false,
