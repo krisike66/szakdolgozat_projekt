@@ -3,7 +3,8 @@ const express = require('express');
 const router = express.Router();
 const {
   getAllTudasanyagok,
-  getTudasanyagById
+  getTudasanyagById,
+  createTudasanyag
 } = require('../Controllers/tudasanyagController');
 
 // GET /api/tudasanyagok -> Összes tudásanyag
@@ -11,5 +12,7 @@ router.get('/', getAllTudasanyagok);
 
 // GET /api/tudasanyagok/:id -> Egy tudásanyag részletesen
 router.get('/:id', getTudasanyagById);
+
+router.post('/', createTudasanyag);
 
 module.exports = router;

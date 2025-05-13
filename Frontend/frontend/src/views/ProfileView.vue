@@ -1,8 +1,5 @@
 <template>
   <div class="profile-page">
-    <!-- Menüsor komponens a tetején -->
-    <MenusorKomponens />
-
     <!-- Profil kártya konténer -->
     <div class="profile-container">
       <div class="profile-card">
@@ -25,13 +22,11 @@
 </template>
 
 <script>
-import MenusorKomponens from '../components/MenusorKomponens.vue';
 import api from '../api';
 
 export default {
   name: 'ProfileView',
   components: {
-    MenusorKomponens,
   },
   data() {
     return {
@@ -44,7 +39,17 @@ export default {
   },
   methods: {
     fetchProfile() {
-      api.get('/users/profile')
+      const token = localStorage.getItem('userToken');  // Hozzáadjuk a token fejléchez
+      if (!token) {
+        this.error = "Nincs érvényes bejelentkezés.";
+        return;
+      }
+
+      api.get('/users/profile', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
         .then(response => {
           this.user = response.data;
         })
@@ -53,12 +58,7 @@ export default {
           this.error = "Nem sikerült betölteni a profil adatait.";
         });
     },
-    logout() {
-      // Töröljük a jwt sütit és átirányítunk a bejelentkezési oldalra
-      document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-      this.$router.push('/login');
-    }
-  },
+}
 };
 </script>
 

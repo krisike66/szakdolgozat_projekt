@@ -5,7 +5,8 @@ const cors = require('cors');
 const db = require('./Models');
 const userRoutes = require('./Routes1/userRoutes');
 const tudasanyagRoutes = require('./Routes1/tudasanyagRoutes');
-
+const cimkeRoutes = require('./Routes1/cimkeRoutes');
+require('dotenv').config();
 const PORT = process.env.PORT || 3000;
 const app = express();
 
@@ -21,12 +22,13 @@ app.use(cors({
 }));
 
 // Adatbázis szinkronizálása
-db.sequelize.sync({ force: false }).then(() => {
+db.sequelize.sync({ alter: true }).then(() => {
     console.log("db has been re sync");
 });
 
 // Route-ok
 app.use('/api/users', userRoutes);
 app.use('/api/tudasanyagok', tudasanyagRoutes);
+app.use('/api/cimkek', cimkeRoutes);
 
 app.listen(PORT, () => console.log(`Server is connected on ${PORT}`));

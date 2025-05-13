@@ -12,17 +12,20 @@ const login = async (req, res) => {
     if (user) {
       const isSame = await bcrypt.compare(password, user.password_hash);
       if (isSame) {
-        // Új token generálása a bejelentkezett felhasználóhoz
-        const token = jwt.sign({ id: user.user_id }, process.env.secretKey, {
-          expiresIn: "1d",
-        });
-        // Frissítjük a sütit, így mindig az aktuális felhasználó tokenje lesz benne
+        // Token generálása a felhasználó ID és role alapján
+        const token = jwt.sign(
+          { user_id: user.user_id, role: user.role },
+          process.env.secretKey,
+          { expiresIn: "1d" }
+        );
+
         res.cookie("jwt", token, {
           httpOnly: true,
-          sameSite: "lax", // vagy 'strict', az igények szerint
-          // domain és path is beállítható, ha szükséges
+          sameSite: "lax",
         });
-        return res.status(201).send(user);
+
+        // Válaszként küldjük a token-t és a user adatokat
+        return res.status(201).json({ token, user });
       } else {
         return res.status(401).send("Authentication failed");
       }
@@ -35,23 +38,119 @@ const login = async (req, res) => {
   }
 };
 
+
+
 const profile = async (req, res) => {
   try {
-    const token = req.cookies.jwt;
+    const token = req.headers.authorization?.split(" ")[1];
     if (!token) {
-      return res.status(401).send({ error: "Unauthorized" });
+      return res.status(401).json({ error: "Autentikáció szükséges" });
     }
+
     const decoded = jwt.verify(token, process.env.secretKey);
-    const user = await User.findByPk(decoded.id);
-    if (user) {
-      return res.status(200).send(user);
+    console.log("Decoded token:", decoded);  // Ellenőrizd, mit tartalmaz a token
+
+    const user = await User.findByPk(decoded.user_id, {
+      attributes: ["user_id", "felhasznalonev", "email", "role"],
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "Felhasználó nem található" });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.error("Profil betöltési hiba:", error);
+    res.status(500).json({ error: "Belső szerver hiba" });
+  }
+};
+
+const createUser = async (req, res) => {
+  try {
+    const { userName, email, password, role } = req.body;
+    if (!userName || !email || !password || !role) {
+      return res.status(400).send({ error: "Missing required fields" });
+    }
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = await User.create({
+      felhasznalonev: userName,
+      email,
+      password_hash: hashedPassword,
+      role
+    });
+    res.status(201).send(newUser);
+  } catch (error) {
+    console.error("Error creating user:", error);
+    res.status(500).send({ error: "Internal server error" });
+  }
+};
+
+
+// Összes felhasználó lekérése
+const getUsers = async (req, res) => {
+  try {
+    // Ha a ?sort=desc kerül megadásra, csökkenő rendezünk, egyébként növekvő
+    const sortOrder = req.query.sort === 'desc' ? 'DESC' : 'ASC';
+    const users = await User.findAll({
+      order: [['user_id', sortOrder]]
+    });
+    res.status(200).send(users);
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    res.status(500).send({ error: "Internal server error" });
+  }
+};
+
+// Felhasználó törlése
+const deleteUser = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const result = await User.destroy({ where: { user_id: userId } });
+    if (result) {
+      return res.status(200).send({ message: "Felhasználó törölve" });
     } else {
-      return res.status(404).send({ error: "User not found" });
+      return res.status(404).send({ error: "Nem található felhasználó" });
     }
   } catch (error) {
-    console.error("Profile error:", error);
+    console.error("Error deleting user:", error);
     return res.status(500).send({ error: "Internal server error" });
   }
 };
 
-module.exports = { login, profile };
+// (Opcionális) Felhasználó módosítása
+const updateUser = async (req, res) => {
+  try {
+    const { userName, email, role } = req.body;
+    const userId = req.params.id;
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res.status(404).send({ error: "User not found" });
+    }
+    // Frissítjük az adatokat
+    user.felhasznalonev = userName;
+    user.email = email;
+    user.role = role;
+    await user.save();
+    return res.status(200).send(user);
+  } catch (error) {
+    console.error("Error updating user:", error);
+    res.status(500).send({ error: "Internal server error" });
+  }
+};
+
+
+const getUserById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findByPk(id);
+    if (!user) {
+      return res.status(404).send({ error: "User not found" });
+    }
+    res.status(200).send(user);
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    res.status(500).send({ error: "Internal server error" });
+  }
+};
+
+module.exports = { login, profile, createUser, getUsers, updateUser, deleteUser, getUserById };

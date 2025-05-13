@@ -4,6 +4,7 @@
       <li><router-link to="/home">Főoldal</router-link></li>
       <li><router-link to="/profile">Profil</router-link></li>
       <li><router-link to="/tudasanyagok">Tudásanyagok</router-link></li>
+      <li v-if="isAdmin"><router-link to="/admin">Admin</router-link></li>
     </ul>
     <div class="logout-container">
       <button class="logout-btn" @click="logout">Kijelentkezés</button>
@@ -14,10 +15,28 @@
 <script>
 export default {
   name: 'MenusorKomponens',
+  data() {
+    return {
+      isAdmin: false,
+    };
+  },
+  mounted() {
+    this.checkAdmin();
+  },
   methods: {
+    checkAdmin() {
+      const token = localStorage.getItem('userToken');
+      if (token) {
+        try {
+          const decoded = JSON.parse(atob(token.split('.')[1]));
+          this.isAdmin = decoded.role === 'admin';
+        } catch (error) {
+          console.error('Token decode error:', error);
+        }
+      }
+    },
     logout() {
-      // Töröljük a JWT sütit és átirányítunk a bejelentkezési oldalra
-      document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      localStorage.removeItem('userToken');
       this.$router.push('/login');
     }
   }
