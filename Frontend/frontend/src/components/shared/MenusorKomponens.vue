@@ -4,6 +4,7 @@
       <li><router-link to="/home">Főoldal</router-link></li>
       <li><router-link to="/profile">Profil</router-link></li>
       <li><router-link to="/tudasanyagok">Tudásanyagok</router-link></li>
+      <li><router-link to="/audit">Audit Panel</router-link></li>
       <li v-if="isAdmin"><router-link to="/admin">Admin</router-link></li>
     </ul>
     <div class="logout-container">

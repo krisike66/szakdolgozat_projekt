@@ -44,6 +44,15 @@ module.exports = (sequelize, DataTypes) => {
         key: 'user_id'
       }
     },
+
+    audit_approved: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+    approved_by: {  
+      type: DataTypes.INTEGER,
+      allowNull: true
+    }
   }, {
     tableName: 'tudasanyagok', 
     timestamps: false, 

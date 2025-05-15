@@ -66,12 +66,19 @@
             email: this.email,
             role: this.role
           }, { withCredentials: true });
+
+          // ✅ Logolás – frissítés után
+          await api.post('/logs', {
+            action: `Felhasználó módosítva: ${this.userName} (ID=${this.userId})`
+          }, { withCredentials: true });
+
           this.successMessage = 'Felhasználó adatai sikeresen frissítve!';
         } catch (error) {
           console.error('Felhasználó frissítési hiba:', error);
           this.errorMessage = 'Hiba történt a felhasználó frissítése során.';
         }
       },
+
       cancelEdit() {
         this.$router.push('/admin');
       }

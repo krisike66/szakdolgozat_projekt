@@ -17,6 +17,7 @@ db.users = require('./userModel')(sequelize, DataTypes);
 db.cimke = require('./Cimke')(sequelize, DataTypes);
 db.tudasanyag = require('./Tudasanyag')(sequelize, DataTypes);
 db.kategoria = require('./Kategoria')(sequelize, DataTypes);
+db.logs = require('./logs')(sequelize, Sequelize);
 
 // Define associations
 // Szerző kapcsolat
@@ -72,6 +73,8 @@ db.tudasanyag.belongsTo(db.kategoria, {
   foreignKey: 'kategoria_id',
   as: 'kategoria'
 });
+
+db.logs.belongsTo(db.users, { foreignKey: 'user_id' });
 
 // Attach models to db object
 module.exports = db;

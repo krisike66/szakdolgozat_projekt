@@ -32,5 +32,8 @@ app.use('/api/users', userRoutes);
 app.use('/api/tudasanyagok', tudasanyagRoutes);
 app.use('/api/cimkek', cimkeRoutes);
 app.use('/api/kategoriak', kategoriakRoutes);
+app.use('/api', require('./Routes1/logsRoutes'));
+
+
 
 app.listen(PORT, () => console.log(`Server is connected on ${PORT}`));

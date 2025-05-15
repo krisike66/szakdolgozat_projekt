@@ -1,31 +1,33 @@
-//importing modules
-const express = require('express')
-const userController = require('../Controllers/userController')
-const { profile, login, createUser } = userController
-const userAuth = require('../Middlewares/userAuth')
-const verifyAdmin = require("../Middlewares/verifyAdmin");
+const express = require('express');
+const userController = require('../Controllers/userController');
+const { profile, login, createUser } = userController;
+const {
+  authenticateToken,
+  verifyAdmin
+} = require('../Middlewares/authMiddleware');
 
-const router = express.Router()
+const router = express.Router();
 
+// 🔓 Login (nyilvános)
+router.post('/login', login);
 
-//login route
-router.post('/login', login )
+// 🔐 Profil (bejelentkezés szükséges)
+router.get('/profile', authenticateToken, profile);
 
-router.get('/profile', profile )
+// 🔐 Felhasználó létrehozása (csak admin)
+router.post('/addUser', verifyAdmin, createUser);
+router.post('/users', verifyAdmin, createUser);
 
-router.post("/users", verifyAdmin, createUser);
+// 🔐 Összes felhasználó lekérése (csak admin)
+router.get('/', verifyAdmin, userController.getUsers);
 
-router.post('/addUser', createUser);
+// 🔐 Egy felhasználó lekérése (csak admin)
+router.get('/:id', verifyAdmin, userController.getUserById);
 
-// Összes felhasználó lekérése
-router.get('/', userController.getUsers);
+// 🔐 Felhasználó törlése (csak admin)
+router.delete('/:id', verifyAdmin, userController.deleteUser);
 
-// Felhasználó törlése
-router.delete('/:id', userController.deleteUser);
+// 🔐 Felhasználó módosítása (csak admin)
+router.put('/:id', verifyAdmin, userController.updateUser);
 
-// (Opcionális) Felhasználó módosítása
-router.put('/:id', userController.updateUser);
-
-router.get('/:id', userController.getUserById);
-
-module.exports = router
+module.exports = router;

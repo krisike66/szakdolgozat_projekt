@@ -22,6 +22,7 @@
             <select v-model="role">
               <option value="user">User</option>
               <option value="admin">Admin</option>
+              <option value="auditer">Auditer</option>
             </select>
           </div>
           <button type="submit">Felhasználó létrehozása</button>
@@ -59,7 +60,23 @@
         </div>
       </div>
     </div>
+
+
+    <!-- Log lista -->
+    <div class="log-list">
+      <h2>Rendszerlogok</h2>
+        <ul>
+          <li v-for="log in logs" :key="log.id">
+            [{{ new Date(log.timestamp).toLocaleString() }}] 
+            <strong>{{ log.user?.felhasznalonev || 'Ismeretlen' }}</strong>
+            {{ log.action }}
+          </li>
+        </ul>
+    </div>
   </template>
+
+  
+
   
   <script>
   import api from '../api';
@@ -75,11 +92,13 @@
         errorMessage: '',
         successMessage: '',
         users: [],
+        logs: [],
         sortOrder: 'asc'
       };
     },
     created() {
       this.fetchUsers();
+      this.fetchLogs();
     },
     methods: {
       async onSubmit() {
@@ -92,6 +111,11 @@
             password: this.password,
             role: this.role
           }, { withCredentials: true });
+          await api.post('/logs', {
+            action: `Felhasználó létrehozva: ${this.userName}`
+          }, {
+            withCredentials: true
+          });
           this.successMessage = 'Felhasználó sikeresen létrehozva!';
           // Űrlap ürítése
           this.userName = '';
@@ -113,14 +137,29 @@
           this.errorMessage = 'Hiba történt a felhasználók lekérése során.';
         }
       },
+      async fetchLogs() {
+        try {
+          const response = await api.get('/logs', { withCredentials: true });
+          console.log("Log válasz:", response.data); // ← Nézd meg a struktúrát
+          this.logs = response.data;
+        } catch (error) {
+          console.error('Logok lekérése hiba:', error);
+        }
+      },
       toggleSortOrder() {
         this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
         this.fetchUsers();
       },
-      onDeleteUser(userId) {
-        api.delete(`/users/${userId}`, { withCredentials: true })
-          .then(() => this.fetchUsers())
-          .catch(error => console.error("Felhasználó törlése hiba:", error));
+      async onDeleteUser(userId) {
+        try {
+          await api.delete(`/users/${userId}`, { withCredentials: true });
+          await api.post('/logs', {
+            action: `Felhasználó törölve: ID=${userId}`
+          }, { withCredentials: true });
+          this.fetchUsers();
+        } catch (error) {
+          console.error("Felhasználó törlése hiba:", error);
+        }
       },
       onEditUser(user) {
         this.$router.push({ name: 'EditUser', params: { userId: user.user_id } });
@@ -249,5 +288,22 @@
     margin: 0 5px;
     font-size: 0.9rem;
   }
+
+  .log-list-container {
+  margin-top: 40px;
+  background-color: #fff;
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+.log-list-container ul {
+  list-style: none;
+  padding: 0;
+}
+.log-list-container li {
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+}
+
   </style>
   

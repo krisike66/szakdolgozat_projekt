@@ -58,6 +58,18 @@ const routes = [
           meta: { requiresAuth: true },
         },
         {
+          path: 'tudasanyagok/:id/edit',
+          name: 'EditTudasanyag',
+          component: () => import('../views/EditTudasanyag.vue'),
+          meta: { requiresAuth: true },
+        },
+        {
+          path: 'audit',
+          name: 'audit',
+          component: () => import('../views/AuditPanelView.vue'),
+          meta: { requiresAuth: true, requiredRole: 'auditer' }
+        },
+        {
           path: 'admin',
           name: 'admin',
           component: AdminPanelView,

@@ -17,7 +17,15 @@
         {{ cimke.nev }}
       </span>
     </div>
-
+    <div class="muvetek">
+        <button v-if="canEditOrDelete" @click="onEdit" class="edit-btn">Szerkesztés</button>
+        <button v-if="canEditOrDelete" @click="onDelete" class="delete-btn">Törlés</button>
+        <button
+          v-if="canApprove"
+          @click="onApprove"
+          class="approve-btn"
+        >Jóváhagyás</button>
+    </div>
   </div>
 </template>
 
@@ -27,13 +35,40 @@ import api from '../api';
 export default {
   data() {
     return {
-      tudasanyag: {}
+      tudasanyag: {},
+      user: {}
     };
   },
+  computed: {
+      canEditOrDelete() {
+        return (
+          this.user.role === 'admin' ||
+          this.user.user_id === this.tudasanyag.letrehozva_altala
+        );
+      },
+      canApprove() {
+        return (
+          (this.user.role === 'admin' || this.user.role === 'auditer') &&
+          this.tudasanyag.audit_approved === false
+        );
+      }
+    },
   created() {
     this.fetchTudasanyag();
+    this.fetchProfile();
   },
   methods: {
+    async fetchProfile() {
+    try {
+      const token = localStorage.getItem('userToken');
+      const response = await api.get('/users/profile', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      this.user = response.data;
+    } catch (error) {
+      console.error("Profil betöltési hiba:", error);
+    }
+  },
     async fetchTudasanyag() {
       try {
         const response = await api.get(`/tudasanyagok/${this.$route.params.id}`, {
@@ -48,6 +83,39 @@ export default {
         console.error('Hiba a tudásanyag részleteinek lekérésekor:', error);
       }
     },
+
+    async onEdit() {
+      this.$router.push({ name: 'EditTudasanyag', params: { id: this.tudasanyag.tudasanyag_id } });
+    },
+
+    async onDelete() {
+      if (!confirm('Biztosan törölni szeretnéd ezt a tudásanyagot?')) return;
+      try {
+        const token = localStorage.getItem('userToken');
+        await api.delete(`/tudasanyagok/${this.tudasanyag.tudasanyag_id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        this.$router.push('/tudasanyagok');
+      } catch (error) {
+        console.error("Törlés hiba:", error);
+        alert("Hiba történt a törlés során.");
+      }
+    },
+
+    async onApprove() {
+      try {
+        const token = localStorage.getItem('userToken');
+        await api.patch(`/tudasanyagok/${this.tudasanyag.tudasanyag_id}/approve`, null, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        alert("Sikeresen jóváhagyva!");
+        this.fetchTudasanyag(); // Frissítés
+      } catch (error) {
+        console.error("Jóváhagyás hiba:", error);
+        alert("Hiba történt a jóváhagyás során.");
+      }
+    },
+
     formatDate(dateString) {
       if (!dateString) return 'Nincs adat';
       const date = new Date(dateString);
@@ -138,4 +206,47 @@ export default {
 .back-btn:hover {
   background-color: #0056b3;
 }
+
+
+.muvetek {
+  margin-top: 30px;
+  display: flex;
+  gap: 10px;
+}
+
+.edit-btn,
+.delete-btn,
+.approve-btn {
+  padding: 8px 16px;
+  font-size: 0.9em;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  border: none;
+}
+
+.edit-btn {
+  background-color: #ffc107;
+  color: #fff;
+}
+.edit-btn:hover {
+  background-color: #e0a800;
+}
+
+.delete-btn {
+  background-color: #dc3545;
+  color: #fff;
+}
+.delete-btn:hover {
+  background-color: #c82333;
+}
+
+.approve-btn {
+  background-color: #28a745;
+  color: #fff;
+}
+.approve-btn:hover {
+  background-color: #218838;
+}
+
 </style>
