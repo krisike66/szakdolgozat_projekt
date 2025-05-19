@@ -8,7 +8,7 @@
 
     <div v-else class="tudasanyagok-container">
       <div v-for="tudas in tudasanyagok" :key="tudas.tudasanyag_id" class="tudas-card">
-        <h3>{{ tudas.cim }}</h3>
+        <h3>{{ shortText(tudas.cim) }}</h3>
         <p><strong>Kategória:</strong> {{ tudas.kategoria?.nev || 'Nincs kategória' }}</p>
         <p><strong>Szerző:</strong> {{ tudas.szerzo?.felhasznalonev || 'Ismeretlen' }}</p>
         <p class="tartalom-preview"><strong>Tartalom:</strong> {{ shortText(tudas.tartalom) }}</p>
@@ -70,7 +70,9 @@ export default {
       this.$router.push({ name: 'EditTudasanyag', params: { id } });
     },
     shortText(text) {
-      return text?.length > 400 ? text.slice(0, 400) + '...' : text;
+      if (!text) return '';
+      const maxLength = 60;
+      return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
     }
   }
 };

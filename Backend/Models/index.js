@@ -94,7 +94,13 @@ db.komment.belongsTo(db.users, {
   foreignKey: 'user_id'
 });
 
+
 // Értékelés kapcsolatok
+db.tudasanyag.hasMany(db.ertekeles, {
+  foreignKey: 'tudasanyag_id',
+  onDelete: 'CASCADE'
+});
+
 db.ertekeles.belongsTo(db.tudasanyag, {
   foreignKey: 'tudasanyag_id'
 });

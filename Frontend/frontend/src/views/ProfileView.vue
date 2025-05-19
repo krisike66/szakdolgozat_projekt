@@ -44,15 +44,20 @@
           <li><strong>Értékeléseim átlaga:</strong> {{ userStats.atlagErtekeles }}/5</li>
         </ul>
       </div>
+      <ProfileStatsChart v-if="userStats" :stats="userStats" />
     </div>
   </div>
 </template>
 
 <script>
 import api from '../api';
+import ProfileStatsChart from '../components/shared/ProfileStatsChart.vue';
 
 export default {
   name: 'ProfileView',
+  components: {
+    ProfileStatsChart
+  },
   data() {
     return {
       userStats: null,
@@ -122,6 +127,12 @@ export default {
 </script>
 
 <style scoped>
+
+canvas {
+  max-width: 500px;
+  margin: 20px auto;
+}
+
 .profile-page {
   background: #f7f7f7;
   min-height: 100vh;

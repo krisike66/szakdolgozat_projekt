@@ -1,19 +1,32 @@
 <template>
   <div class="create-tudasanyag">
-    <h2>Új Tudásanyag Létrehozása</h2>
+    <h2>Tudásanyag létrehozása</h2>
     <form @submit.prevent="createTudasanyag">
       <div class="form-group">
         <label for="title">Cím</label>
-        <input type="text" id="title" v-model="title" required />
+        <input type="text" id="title" v-model="title" required placeholder="Pl.: Etikai kódex" />
       </div>
+
       <div class="form-group">
         <label for="content">Tartalom</label>
-        <textarea id="content" v-model="content" rows="5" required></textarea>
+        <textarea id="content" v-model="content" rows="5" required placeholder="Írd be a tudásanyagot..."></textarea>
       </div>
+
       <div class="form-group">
-        <label for="category">Kategória ID</label>
-        <input type="number" id="category" v-model="category" required />
+        <label for="file">Fájl csatolása</label>
+        <input type="file" id="file" @change="handleFileUpload" />
       </div>
+
+      <div class="form-group">
+        <label for="category">Kategória</label>
+        <select v-model="selectedCategoryName" required>
+          <option disabled value="">Válassz kategóriát</option>
+          <option v-for="kat in kategoriak" :key="kat.kategoria_id" :value="kat.nev">
+            {{ kat.nev }}
+          </option>
+        </select>
+      </div>
+
       <div class="form-group">
         <label for="tags">Címkék</label>
         <select id="tags" v-model="selectedCimkek" multiple>
@@ -22,7 +35,9 @@
           </option>
         </select>
       </div>
+
       <button type="submit" class="submit-btn">Létrehozás</button>
+
       <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
       <p v-if="successMessage" class="success">{{ successMessage }}</p>
     </form>
@@ -37,111 +52,144 @@ export default {
     return {
       title: '',
       content: '',
-      category: 1,
+      selectedCategoryName: '',
+      kategoriak: [],
       cimkek: [],
       selectedCimkek: [],
       errorMessage: '',
-      successMessage: ''
+      successMessage: '',
+      file: null
     };
   },
   async created() {
-    await this.fetchCimkek(); // Csak egyszer hívjuk meg!
+    await this.fetchKategoriak();
+    await this.fetchCimkek();
   },
   methods: {
+    async fetchKategoriak() {
+      try {
+        const res = await api.get('/kategoriak');
+        this.kategoriak = res.data;
+      } catch (error) {
+        console.error('Kategóriák lekérése sikertelen:', error);
+        this.errorMessage = 'Nem sikerült betölteni a kategóriákat.';
+      }
+    },
     async fetchCimkek() {
       try {
-        const response = await api.get('/cimkek', { withCredentials: true });
-        // Ne töltse be újra a címkéket, ha már megvannak
-        if (this.cimkek.length === 0) {
-          this.cimkek = response.data;
-        }
+        const res = await api.get('/cimkek');
+        this.cimkek = res.data;
       } catch (error) {
-        console.error('Címkék lekérése hiba:', error);
+        console.error('Címkék lekérése sikertelen:', error);
         this.errorMessage = 'Nem sikerült betölteni a címkéket.';
       }
     },
+    handleFileUpload(event) {
+      this.file = event.target.files[0];
+    },
     async createTudasanyag() {
       try {
-        const token = localStorage.getItem('userToken');  // JWT token lekérése
+        const token = localStorage.getItem('userToken');
 
-        const payload = {
-          cim: this.title,
-          tartalom: this.content,
-          kategoria_id: this.category,
-          cimkek: this.selectedCimkek
-        };
+        const selectedKategoria = this.kategoriak.find(k => k.nev === this.selectedCategoryName);
+        if (!selectedKategoria) {
+          this.errorMessage = 'Érvénytelen kategória.';
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append('cim', this.title);
+        formData.append('tartalom', this.content);
+        formData.append('kategoria_id', selectedKategoria.kategoria_id);
+
+        if (this.file) {
+          formData.append('file', this.file); // ⬅️ fájl hozzáadása
+        }
+
+        this.selectedCimkek.forEach(cimkeId => {
+          formData.append('cimkek[]', cimkeId); // Több címke
+        });
 
         const headers = {
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'multipart/form-data'
         };
 
-        // Küldjük a POST kérést a tokennel együtt
-        await api.post('/tudasanyagok', payload, { headers });
+        await api.post('/tudasanyagok', formData, { headers });
 
         this.successMessage = 'A tudásanyag sikeresen létrehozva!';
-        
-        // Űrlap mezők törlése
+        this.errorMessage = '';
         this.title = '';
         this.content = '';
-        this.category = 1;
+        this.selectedCategoryName = '';
         this.selectedCimkek = [];
-        
-        // Vissza a tudásanyagok listához
+        this.file = null;
+
         this.$router.push('/tudasanyagok');
       } catch (error) {
         console.error('Tudásanyag létrehozási hiba:', error);
         this.errorMessage = 'Hiba történt a tudásanyag létrehozása során.';
+        this.successMessage = '';
       }
     }
   }
 };
 </script>
 
-
 <style scoped>
 .create-tudasanyag {
   max-width: 600px;
-  margin: 20px auto;
-  background-color: #f8f9fa;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin: 40px auto;
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
 }
 
 .create-tudasanyag h2 {
   text-align: center;
-  margin-bottom: 20px;
+  color: #333;
+  margin-bottom: 25px;
 }
 
 .form-group {
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 }
 
 .form-group label {
-  display: block;
-  margin-bottom: 5px;
   font-weight: bold;
+  display: block;
+  margin-bottom: 6px;
 }
 
 .form-group input,
 .form-group textarea,
 .form-group select {
   width: 100%;
-  padding: 10px;
-  margin-bottom: 10px;
+  padding: 12px;
   border: 1px solid #ccc;
-  border-radius: 4px;
+  border-radius: 6px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.form-group select[multiple] {
+  height: auto;
+  min-height: 100px;
 }
 
 .submit-btn {
+  display: block;
+  width: 100%;
+  padding: 12px;
   background-color: #007bff;
-  color: #fff;
+  color: white;
+  font-weight: bold;
   border: none;
-  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 16px;
   cursor: pointer;
-  border-radius: 4px;
-  transition: background-color 0.3s;
+  transition: background 0.3s ease;
 }
 
 .submit-btn:hover {
@@ -149,12 +197,14 @@ export default {
 }
 
 .error {
-  color: #dc3545;
   margin-top: 10px;
+  color: #dc3545;
+  text-align: center;
 }
 
 .success {
-  color: #28a745;
   margin-top: 10px;
+  color: #28a745;
+  text-align: center;
 }
 </style>

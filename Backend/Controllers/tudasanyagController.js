@@ -74,6 +74,9 @@ const getAllTudasanyagok = async (req, res) => {
 // Új tudásanyag létrehozása
 const createTudasanyag = async (req, res) => {
   try {
+
+    console.log('BODY:', req.body);
+    console.log('FILE:', req.file);
     const token = req.headers.authorization?.split(' ')[1];
     if (!token) {
       return res.status(401).json({ error: 'Autentikáció szükséges' });
@@ -82,8 +85,16 @@ const createTudasanyag = async (req, res) => {
     const decoded = jwt.verify(token, process.env.secretKey);
     const userId = decoded.user_id;  // A tokenből kinyert user_id
 
-    const { cim, tartalom, kategoria_id, cimkek } = req.body;
+    const cim = req.body.cim;
+    const tartalom = req.body.tartalom;
+    const kategoria_id = req.body.kategoria_id;
+    let cimkek = req.body.cimkek;
 
+    if (typeof cimkek === 'string') {
+      cimkek = [cimkek];
+    }
+
+    const filePath = req.file ? req.file.filename : null;
     // Tudásanyag létrehozása
     const newTudasanyag = await Tudasanyag.create({
       cim,
@@ -94,6 +105,7 @@ const createTudasanyag = async (req, res) => {
       letrehozva_altala: userId,
       modositva_altala: userId,
       audit_approved: false,
+      file: filePath
     });
 
     console.log("Decoded token:", decoded);
@@ -209,7 +221,10 @@ const approveTudasanyag = async (req, res) => {
 const updateTudasanyag = async (req, res) => {
   try {
     const { id } = req.params;
-    const { cim, tartalom, kategoria_id, cimkek } = req.body;
+    const cim = req.body.cim;
+    const tartalom = req.body.tartalom;
+    const kategoria_id = req.body.kategoria_id;
+    let cimkek = req.body.cimkek;
     const user = req.user;
 
     const tudasanyag = await db.tudasanyag.findByPk(id, {
@@ -232,11 +247,18 @@ const updateTudasanyag = async (req, res) => {
       return res.status(403).json({ error: 'Nincs jogosultságod a módosításhoz' });
     }
 
+    if (typeof cimkek === 'string') {
+      cimkek = [cimkek]; // ha csak egy van
+    }
+
+    const filePath = req.file ? req.file.filename : tudasanyag.file;
+
     // Frissítés
     await tudasanyag.update({
       cim,
       tartalom,
       kategoria_id,
+      file: filePath,
       modositva: new Date(),
       modositva_altala: user.user_id,
       audit_approved: false,         // új módosítás → újra jóvá kell hagyni
@@ -266,11 +288,47 @@ const updateTudasanyag = async (req, res) => {
 };
 
 
+const hasonlok = require('../hasonlok.json'); // statikus fájl
+
+const getHasonloTudasanyagok = async (req, res) => {
+  const id = req.params.id;
+
+  const lista = hasonlok[id];
+  if (!lista || lista.length === 0) {
+    return res.status(404).json({ error: "Nem található hasonló tudásanyag." });
+  }
+
+  try {
+    const eredmeny = await db.tudasanyag.findAll({
+      where: {
+        tudasanyag_id: lista.map(item => item.id)
+      },
+      attributes: ['tudasanyag_id', 'cim'] // vagy több mező, ha kell
+    });
+
+    // eredmények sorrendbe rendezése az eredeti score lista alapján
+    const rendezett = lista
+      .map(item => {
+        const match = eredmeny.find(e => e.tudasanyag_id === item.id);
+        return match ? { ...match.dataValues, score: item.score } : null;
+      })
+      .filter(Boolean);
+
+    res.json(rendezett);
+  } catch (error) {
+    console.error("Hasonló tudásanyagok hiba:", error);
+    res.status(500).json({ error: "Belső hiba" });
+  }
+};
+
+
+
 module.exports = {
   getAllTudasanyagok,
   getTudasanyagById,
   createTudasanyag,
   deleteTudasanyag,
   approveTudasanyag,
-  updateTudasanyag
+  updateTudasanyag,
+  getHasonloTudasanyagok
 };

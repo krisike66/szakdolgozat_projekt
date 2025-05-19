@@ -11,11 +11,14 @@ const ertesitesRoutes = require('./Routes1/ertesitesRoutes');
 require('dotenv').config();
 const PORT = process.env.PORT || 3000;
 const app = express();
+const path = require('path');
 
 // Middleware-ek
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // CORS beállítás (frontend: 8081)
 app.use(cors({

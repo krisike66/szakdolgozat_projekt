@@ -29,7 +29,7 @@
         <div v-for="item in topRated" :key="item.tudasanyag_id" class="card" @click="$router.push(`/tudasanyagok/${item.tudasanyag_id}`)">
           <h3>{{ item.cim }}</h3>
           <p><strong>Szerző:</strong> {{ item.szerzo?.felhasznalonev || 'Ismeretlen' }}</p>
-          <p><strong>Átlag:</strong> {{ item.atlag }}/5</p>
+          <p><strong>Átlag:</strong> {{ item.atlag }}/5 <img src="../assets/csillag.png" alt="csillag" class="csillag"/></p>
         </div>
       </div>
     </div>
@@ -206,4 +206,8 @@ input[type="text"] {
   gap: 20px;
 }
 
+.csillag {
+  width: 15px;
+  height: 15px;
+}
 </style>

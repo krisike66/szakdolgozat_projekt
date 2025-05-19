@@ -52,6 +52,10 @@ module.exports = (sequelize, DataTypes) => {
     approved_by: {  
       type: DataTypes.INTEGER,
       allowNull: true
+    },
+    file: {
+      type: DataTypes.STRING,
+      allowNull: true
     }
   }, {
     tableName: 'tudasanyagok', 

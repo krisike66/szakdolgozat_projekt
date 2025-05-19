@@ -2,13 +2,15 @@
 const express = require('express');
 const router = express.Router();
 const { authenticateToken, verifyAuditerOrAdmin } = require('../Middlewares/authMiddleware');
+const upload = require('../Middlewares/upload');
 const {
   getAllTudasanyagok,
   getTudasanyagById,
   createTudasanyag,
   updateTudasanyag,
   deleteTudasanyag,
-  approveTudasanyag
+  approveTudasanyag,
+  getHasonloTudasanyagok
 } = require('../Controllers/tudasanyagController');
 
 
@@ -20,10 +22,10 @@ router.get('/', getAllTudasanyagok);
 router.get('/:id', getTudasanyagById);
 
 // Új tudásanyag
-router.post('/', authenticateToken, createTudasanyag);
+router.post('/', authenticateToken, upload.single('file'), createTudasanyag);
 
 // Tudásanyag frissítése
-router.put('/:id', authenticateToken, updateTudasanyag);
+router.put('/:id', authenticateToken, upload.single('file'), updateTudasanyag);
 
 // Tudásanyag törlése
 router.delete('/:id', authenticateToken, deleteTudasanyag);
@@ -31,7 +33,13 @@ router.delete('/:id', authenticateToken, deleteTudasanyag);
 // Tudásanyag jóváhagyása (auditer vagy admin)
 router.patch('/:id/approve', verifyAuditerOrAdmin, approveTudasanyag);
 
-router.put('/:id', authenticateToken, updateTudasanyag);
+
+
+router.get('/:id/hasonlok', getHasonloTudasanyagok);
+
+
+router.post('/', authenticateToken, upload.single('file'), createTudasanyag);
+
 
 
 module.exports = router;

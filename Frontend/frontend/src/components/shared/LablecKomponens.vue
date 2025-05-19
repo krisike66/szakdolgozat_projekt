@@ -1,6 +1,6 @@
 <template>
     <footer class="footer">
-      <p>&copy; 2024 Tudásbázis</p>
+      <p>&copy; 2025 NAV Tudásbázis</p>
       <ul class="footer-links">
         <li><a href="mailto:info@tudasbazis.hu">Kapcsolat</a></li>
         <li><a href="/impresszum">Impresszum</a></li>
@@ -26,6 +26,7 @@
   .footer p {
     margin: 0;
     font-size: 0.9em;
+    color:#00b4db
   }
   
   .footer-links {

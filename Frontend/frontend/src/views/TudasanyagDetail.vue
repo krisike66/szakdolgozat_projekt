@@ -12,6 +12,12 @@
     <div class="content">
       <p>{{ tudasanyag.tartalom }}</p>
     </div>
+    <div v-if="tudasanyag.file" class="letoltes">
+      <p><strong>Csatolt fájl:</strong></p>
+      <a :href="`http://localhost:3000/uploads/${tudasanyag.file}`" target="_blank" download>
+        {{ tudasanyag.file }}
+      </a>
+    </div>
     <div class="cimkek">
       <span v-for="cimke in tudasanyag.cimkek" :key="cimke.cimke_id" class="cimke">
         {{ cimke.nev }}
@@ -58,6 +64,19 @@
     </li>
   </ul>
 </div>
+
+
+
+<div v-if="hasonlok.length" class="hasonlo-box">
+  <h3>Ez is érdekelhet:</h3>
+  <ul>
+    <li v-for="item in hasonlok" :key="item.tudasanyag_id">
+      <router-link :to="`/tudasanyagok/${item.tudasanyag_id}`">
+        {{ item.cim }}
+      </router-link>
+    </li>
+  </ul>
+</div>
 </template>
 
 <script>
@@ -75,7 +94,8 @@ export default {
       userErtekeles: 0,
       atlagErtekeles: null,
       csillagPath: require('@/assets/csillag.png'),
-      uresCsillagPath: require('@/assets/ures_csillag.png')
+      uresCsillagPath: require('@/assets/ures_csillag.png'),
+      hasonlok: []
     };
   },
   async mounted() {
@@ -103,6 +123,7 @@ export default {
     this.fetchProfile();
     this.fetchKommentek();
     this.fetchAtlagErtekeles();
+    this.fetchHasonlo();
   },
   methods: {
         async fetchProfile() {
@@ -117,24 +138,38 @@ export default {
         }
       },
 
-        async fetchUserErtekeles() {
-      try {
-        const token = localStorage.getItem('userToken');
-        if (!token) return;
-
-        const response = await api.get(`/ertekeles/${this.$route.params.id}/user`, {
-          headers: {
-            Authorization: `Bearer ${token}`
+        async fetchHasonlo() {
+          const token = localStorage.getItem("userToken");
+          const id = this.$route.params.id;
+          try {
+            const res = await api.get(`/tudasanyagok/${id}/hasonlok`, {
+              headers: { Authorization: `Bearer ${token}` }
+            });
+            this.hasonlok = res.data;
+          } catch (err) {
+            console.error("Ajánlott tartalmak hiba:", err);
           }
-        });
+        },
 
-        if (response.data.ertekeles) {
-          this.userErtekeles = response.data.ertekeles;
-          this.ertekeltMar = true;
+
+      async fetchUserErtekeles() {
+        try {
+          const token = localStorage.getItem('userToken');
+          if (!token) return;
+
+          const response = await api.get(`/ertekeles/${this.$route.params.id}/user`, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          });
+
+          if (response.data.ertekeles) {
+            this.userErtekeles = response.data.ertekeles;
+            this.ertekeltMar = true;
+          }
+        } catch (error) {
+          console.error('Saját értékelés lekérése hiba:', error);
         }
-      } catch (error) {
-        console.error('Saját értékelés lekérése hiba:', error);
-      }
     },
 
     async fetchTudasanyag() {
@@ -424,4 +459,63 @@ export default {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+
+.hasonlo-box {
+  background-color: #f0f8ff;
+  border-left: 5px solid #007bff;
+  padding: 16px 24px;
+  margin-top: 40px;
+  border-radius: 8px;
+  font-family: 'Segoe UI', sans-serif;
+  box-shadow: 0 2px 6px rgba(0, 123, 255, 0.1);
+}
+
+.hasonlo-box h3 {
+  color: #0056b3;
+  margin-bottom: 10px;
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+.hasonlo-box ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.hasonlo-box li {
+  margin-bottom: 8px;
+}
+
+.hasonlo-box a {
+  text-decoration: none;
+  color: #007bff;
+  transition: color 0.3s ease;
+}
+
+.hasonlo-box a:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
+
+
+.letoltes {
+  margin-top: 20px;
+  padding: 10px;
+  background-color: #f5f5f5;
+  border-left: 4px solid #007bff;
+  border-radius: 6px;
+}
+
+.letoltes a {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.letoltes a:hover {
+  text-decoration: underline;
+}
+
 </style>
