@@ -34,6 +34,16 @@
           </div>
         </div>
       </div>
+      <div class="stat-box" v-if="userStats">
+        <h2>Statisztikák</h2>
+        <ul>
+          <li><strong>Létrehozott tudásanyagok:</strong> {{ userStats.letrehozott }}</li>
+          <li><strong>Módosított tudásanyagok:</strong> {{ userStats.modositott }}</li>
+          <li><strong>Hozzászólások:</strong> {{ userStats.kommentek }}</li>
+          <li><strong>Értékelések száma:</strong> {{ userStats.ertekelesek }}</li>
+          <li><strong>Értékeléseim átlaga:</strong> {{ userStats.atlagErtekeles }}/5</li>
+        </ul>
+      </div>
     </div>
   </div>
 </template>
@@ -45,6 +55,7 @@ export default {
   name: 'ProfileView',
   data() {
     return {
+      userStats: null,
       user: null,
       error: null,
       userTudasanyagok: []
@@ -53,8 +64,20 @@ export default {
   created() {
     this.fetchProfile();
     this.fetchOwnTudasanyagok();
+    this.fetchUserStats();
   },
   methods: {
+    async fetchUserStats() {
+      try {
+        const token = localStorage.getItem('userToken');
+        const res = await api.get('/users/stats', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        this.userStats = res.data;
+      } catch (err) {
+        console.error("Statisztika lekérési hiba:", err);
+      }
+    },
     fetchProfile() {
       const token = localStorage.getItem('userToken');
       if (!token) {
@@ -203,5 +226,31 @@ export default {
 .card-box small {
   color: #999;
   font-size: 0.85em;
+}
+
+
+.stat-box {
+  text-align: left;
+  margin-top: 30px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  padding: 20px;
+  border-left: 4px solid #007bff;
+}
+
+.stat-box h2 {
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.stat-box ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.stat-box li {
+  margin-bottom: 8px;
+  font-size: 1em;
+  color: #555;
 }
 </style>

@@ -57,31 +57,5 @@ module.exports = (sequelize, DataTypes) => {
     tableName: 'tudasanyagok', 
     timestamps: false, 
   });
-
-  // Kapcsolatok beállítása
-  Tudasanyag.associate = (models) => {
-    // Címke kapcsolat (Many-to-Many)
-    Tudasanyag.belongsToMany(models.Cimke, {
-      through: 'tudasanyag_cimke',
-      foreignKey: 'tudasanyag_id',
-      otherKey: 'cimke_id',
-      as: 'cimkek'
-    });
-
-    // Szerző kapcsolat (Many-to-One)
-    Tudasanyag.belongsTo(models.users, {
-      foreignKey: 'letrehozva_altala',
-      as: 'szerzo',
-      onDelete: 'SET NULL'
-    });
-
-    // Módosító kapcsolat (Many-to-One)
-    Tudasanyag.belongsTo(models.users, {
-      foreignKey: 'modositva_altala',
-      as: 'modosito',
-      onDelete: 'SET NULL'
-    });
-  };
-
   return Tudasanyag;
 };

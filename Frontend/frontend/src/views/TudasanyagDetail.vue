@@ -27,6 +27,37 @@
         >Jóváhagyás</button>
     </div>
   </div>
+
+
+
+  <!-- Kommentek és értékelés szekció -->
+<div class="komment-ertekeles-szekcio">
+  <h2>Értékelés</h2>
+  <div class="csillagok">
+    <img 
+      v-for="n in 5"
+      :key="n"
+      :src="n <= userErtekeles ? csillagPath : uresCsillagPath"
+      :alt="`${n} csillag`"
+      class="csillag"
+      :class="{ disabled: hasRated }"
+      @click="!hasRated && submitErtekeles(n)"
+    />
+  </div>
+  <p v-if="atlagErtekeles">Átlag: {{ parseFloat(atlagErtekeles).toFixed(1) }}/5</p>
+
+  <h2>Hozzászólások</h2>
+  <form @submit.prevent="submitKomment">
+    <textarea v-model="ujKomment" placeholder="Írj egy hozzászólást..." rows="3"></textarea>
+    <button type="submit">Küldés</button>
+  </form>
+
+  <ul class="komment-lista">
+    <li v-for="komment in kommentek" :key="komment.id">
+      <strong>{{ komment.user?.felhasznalonev || 'Anonim' }}</strong>: {{ komment.szoveg }}
+    </li>
+  </ul>
+</div>
 </template>
 
 <script>
@@ -35,9 +66,23 @@ import api from '../api';
 export default {
   data() {
     return {
+      hasRated: false,
+      ertekeltMar: false,
       tudasanyag: {},
-      user: {}
+      user: {},
+      kommentek: [],
+      ujKomment: '',
+      userErtekeles: 0,
+      atlagErtekeles: null,
+      csillagPath: require('@/assets/csillag.png'),
+      uresCsillagPath: require('@/assets/ures_csillag.png')
     };
+  },
+  async mounted() {
+    await this.fetchTudasanyag();
+    await this.fetchKommentek();
+    await this.fetchAtlagErtekeles();
+    await this.fetchUserErtekeles();
   },
   computed: {
       canEditOrDelete() {
@@ -56,31 +101,107 @@ export default {
   created() {
     this.fetchTudasanyag();
     this.fetchProfile();
+    this.fetchKommentek();
+    this.fetchAtlagErtekeles();
   },
   methods: {
-    async fetchProfile() {
-    try {
-      const token = localStorage.getItem('userToken');
-      const response = await api.get('/users/profile', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      this.user = response.data;
-    } catch (error) {
-      console.error("Profil betöltési hiba:", error);
-    }
-  },
+        async fetchProfile() {
+        try {
+          const token = localStorage.getItem('userToken');
+          const response = await api.get('/users/profile', {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          this.user = response.data;
+        } catch (error) {
+          console.error("Profil betöltési hiba:", error);
+        }
+      },
+
+        async fetchUserErtekeles() {
+      try {
+        const token = localStorage.getItem('userToken');
+        if (!token) return;
+
+        const response = await api.get(`/ertekeles/${this.$route.params.id}/user`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        if (response.data.ertekeles) {
+          this.userErtekeles = response.data.ertekeles;
+          this.ertekeltMar = true;
+        }
+      } catch (error) {
+        console.error('Saját értékelés lekérése hiba:', error);
+      }
+    },
+
     async fetchTudasanyag() {
       try {
         const response = await api.get(`/tudasanyagok/${this.$route.params.id}`, {
           withCredentials: true,
           params: {
-            includeCimkek: true  // <-- Címkék betöltése
+            includeCimkek: true 
           }
         });
         this.tudasanyag = response.data || {};
         console.log("Tudasanyag adatok:", this.tudasanyag);
       } catch (error) {
         console.error('Hiba a tudásanyag részleteinek lekérésekor:', error);
+      }
+    },
+
+
+    async fetchKommentek() {
+      try {
+        const res = await api.get(`/kommentek/${this.$route.params.id}`);
+        this.kommentek = res.data;
+      } catch (e) {
+        console.error("Kommentek betöltése hiba:", e);
+      }
+    },
+    async submitKomment() {
+      try {
+        const token = localStorage.getItem('userToken');
+        await api.post('/komment', {
+          szoveg: this.ujKomment,
+          tudasanyag_id: this.$route.params.id
+        }, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        this.ujKomment = '';
+        this.fetchKommentek();
+      } catch (e) {
+        console.error("Komment küldés hiba:", e);
+      }
+    },
+    async fetchAtlagErtekeles() {
+      try {
+        const res = await api.get(`/ertekeles/atlag/${this.$route.params.id}`);
+        this.atlagErtekeles = res.data.atlag;
+      } catch (e) {
+        console.error("Átlagértékelés lekérés hiba:", e);
+      }
+    },
+    async submitErtekeles(ertek) {
+      if (this.hasRated) {
+        alert("Már értékelted ezt a tudásanyagot.");
+        return;
+      }
+      try {
+        const token = localStorage.getItem('userToken');
+        await api.post('/ertekeles', {
+          ertekeles: ertek,
+          tudasanyag_id: this.$route.params.id
+        }, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        this.userErtekeles = ertek;
+        this.ertekeltMar = true;
+        this.fetchAtlagErtekeles();
+      } catch (e) {
+        console.error("Értékelés hiba:", e);
       }
     },
 
@@ -249,4 +370,58 @@ export default {
   background-color: #218838;
 }
 
+.komment-ertekeles-szekcio {
+  margin-top: 40px;
+  padding-top: 30px;
+  border-top: 2px solid #ccc;
+}
+
+.komment-ertekeles-szekcio textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  font-size: 1em;
+}
+
+.komment-ertekeles-szekcio button {
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.csillagok {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.csillag {
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+}
+
+.komment-lista {
+  margin-top: 20px;
+  list-style: none;
+  padding: 0;
+}
+
+.komment-lista li {
+  margin-bottom: 10px;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: 6px;
+}
+
+
+.star.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 </style>

@@ -18,15 +18,5 @@ module.exports = (sequelize, DataTypes) => {
         tableName: 'cimkek',
         timestamps: false,
     });
-
-    Cimke.associate = (models) => {
-        Cimke.belongsToMany(models.Tudasanyag, {
-            through: 'tudasanyag_cimke',
-            foreignKey: 'cimke_id',
-            otherKey: 'tudasanyag_id',
-            as: 'tudasanyagok'
-        });
-    };
-
     return Cimke;
 };

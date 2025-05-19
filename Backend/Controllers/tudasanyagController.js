@@ -194,6 +194,13 @@ const approveTudasanyag = async (req, res) => {
     action: `Tudásanyag jóváhagyva: ${tudasanyag.cim}`,
     timestamp: new Date()
   });
+  const tud = await db.tudasanyag.findByPk(id);
+  await db.ertesites.create({
+      user_id: tud.letrehozva_altala,
+      tipus: "Jóváhagyás",
+      uzenet: `A "${tud.cim}" című tudásanyagodat jóváhagyták.`,
+      olvasott: false
+    });
 
   res.json({ message: 'Jóváhagyva' });
 };

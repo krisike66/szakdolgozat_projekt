@@ -24,6 +24,14 @@
           <p>{{ kat.leiras }}</p>
         </div>
       </div>
+      <h2>Legjobbra értékelt tudásanyagok</h2>
+      <div class="top-rated-container">
+        <div v-for="item in topRated" :key="item.tudasanyag_id" class="card" @click="$router.push(`/tudasanyagok/${item.tudasanyag_id}`)">
+          <h3>{{ item.cim }}</h3>
+          <p><strong>Szerző:</strong> {{ item.szerzo?.felhasznalonev || 'Ismeretlen' }}</p>
+          <p><strong>Átlag:</strong> {{ item.atlag }}/5</p>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -35,7 +43,8 @@ export default {
   data() {
     return {
       search: "",
-      kategoriak: []
+      kategoriak: [],
+      topRated: []
     };
   },
   computed: {
@@ -48,8 +57,18 @@ export default {
   },
   created() {
     this.fetchKategoriak();
+    this.fetchTopRated();
   },
   methods: {
+    async fetchTopRated() {
+        try {
+          const res = await api.get("/ertekeles/top5");
+          this.topRated = res.data;
+        } catch (err) {
+          console.error("Top értékelt tudásanyagok lekérési hiba:", err);
+        }
+      },
+
     async fetchKategoriak() {
       try {
         const res = await api.get("/kategoriak");
@@ -89,10 +108,15 @@ h1 {
 }
 
 h2 {
+  display: inline-block;
   font-size: 1.8em;
   color: #003366;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
+  margin-top: 10px;
+  padding-bottom: 5px;
+  border-bottom:2px solid #002855;
 }
+
 
 p {
   font-size: 1.1em;
@@ -173,4 +197,13 @@ input[type="text"] {
 .footer-content a:hover {
   text-decoration: underline;
 }
+
+.top-rated-container {
+  margin: 40px auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+}
+
 </style>

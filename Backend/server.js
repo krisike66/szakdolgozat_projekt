@@ -7,6 +7,7 @@ const userRoutes = require('./Routes1/userRoutes');
 const tudasanyagRoutes = require('./Routes1/tudasanyagRoutes');
 const cimkeRoutes = require('./Routes1/cimkeRoutes');
 const kategoriakRoutes = require('./Routes1/kategoriakRoutes');
+const ertesitesRoutes = require('./Routes1/ertesitesRoutes');
 require('dotenv').config();
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -33,6 +34,8 @@ app.use('/api/tudasanyagok', tudasanyagRoutes);
 app.use('/api/cimkek', cimkeRoutes);
 app.use('/api/kategoriak', kategoriakRoutes);
 app.use('/api', require('./Routes1/logsRoutes'));
+app.use('/api', require('./Routes1/kommentErtekelesRoutes'));
+app.use('/api/ertesitesek', ertesitesRoutes);
 
 
 

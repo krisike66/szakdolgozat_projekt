@@ -19,7 +19,17 @@ db.tudasanyag = require('./Tudasanyag')(sequelize, DataTypes);
 db.kategoria = require('./Kategoria')(sequelize, DataTypes);
 db.logs = require('./logs')(sequelize, Sequelize);
 
+db.komment = require('./kommentModel')(sequelize, DataTypes);
+db.ertekeles = require('./ertekelesModel')(sequelize, DataTypes);
+db.ertesites = require('./ertesites')(sequelize, DataTypes);
+
+
 // Define associations
+Object.keys(db).forEach((modelName) => {
+  if (db[modelName].associate) {
+    db[modelName].associate(db);
+  }
+});
 // Szerző kapcsolat
 db.tudasanyag.belongsTo(db.users, {
   foreignKey: 'letrehozva_altala',
@@ -75,6 +85,25 @@ db.tudasanyag.belongsTo(db.kategoria, {
 });
 
 db.logs.belongsTo(db.users, { foreignKey: 'user_id' });
+
+// Komment kapcsolatok
+db.komment.belongsTo(db.tudasanyag, {
+  foreignKey: 'tudasanyag_id'
+});
+db.komment.belongsTo(db.users, {
+  foreignKey: 'user_id'
+});
+
+// Értékelés kapcsolatok
+db.ertekeles.belongsTo(db.tudasanyag, {
+  foreignKey: 'tudasanyag_id'
+});
+db.ertekeles.belongsTo(db.users, {
+  foreignKey: 'user_id'
+});
+
+
+
 
 // Attach models to db object
 module.exports = db;

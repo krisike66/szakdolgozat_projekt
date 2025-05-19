@@ -34,13 +34,9 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   User.associate = (models) => {
-      User.hasMany(models.Tudasanyag, {
-          foreignKey: 'letrehozva_altala',
-          as: 'letrehozottTudasanyagok'
-      });
-      User.hasMany(models.Tudasanyag, {
-          foreignKey: 'modositva_altala',
-          as: 'modositottTudasanyagok'
+      User.hasMany(models.ertesites, {
+        foreignKey: 'user_id',
+        as: 'ertesitesek'
       });
   };
 

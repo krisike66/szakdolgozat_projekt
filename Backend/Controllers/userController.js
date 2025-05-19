@@ -4,6 +4,10 @@ const jwt = require("jsonwebtoken");
 
 // Adatbázisból a felhasználó modell
 const User = db.users;
+const Tudasanyag = db.tudasanyag;
+const Komment = db.komment;
+const Ertekeles = db.ertekeles;
+
 
 const login = async (req, res) => {
   try {
@@ -142,6 +146,9 @@ const updateUser = async (req, res) => {
 const getUserById = async (req, res) => {
   try {
     const { id } = req.params;
+    if (isNaN(parseInt(id))) {
+      return res.status(400).send({ error: "Az ID nem szám." });
+    }
     const user = await User.findByPk(id);
     if (!user) {
       return res.status(404).send({ error: "User not found" });
@@ -153,4 +160,38 @@ const getUserById = async (req, res) => {
   }
 };
 
-module.exports = { login, profile, createUser, getUsers, updateUser, deleteUser, getUserById };
+
+
+const getUserStats = async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return res.status(401).json({ error: 'Token szükséges' });
+
+    const decoded = jwt.verify(token, process.env.secretKey);
+    const user_id = decoded.user_id;
+
+    const [letrehozott, modositott, kommentek, ertekelesek, atlagErtekeles] = await Promise.all([
+      Tudasanyag.count({ where: { letrehozva_altala: user_id } }),
+      Tudasanyag.count({ where: { modositva_altala: user_id } }),
+      Komment.count({ where: { user_id } }),
+      Ertekeles.count({ where: { user_id } }),
+      Ertekeles.findOne({
+        where: { user_id },
+        attributes: [[db.Sequelize.fn('AVG', db.Sequelize.col('ertekeles')), 'atlag']]
+      })
+    ]);
+
+    res.json({
+      letrehozott,
+      modositott,
+      kommentek,
+      ertekelesek,
+      atlagErtekeles: parseFloat(atlagErtekeles?.dataValues?.atlag || 0).toFixed(2)
+    });
+  } catch (err) {
+    console.error("Statisztika lekérés hiba:", err);
+    res.status(500).json({ error: 'Belső szerver hiba' });
+  }
+};
+
+module.exports = { login, profile, createUser, getUsers, updateUser, deleteUser, getUserById, getUserStats };

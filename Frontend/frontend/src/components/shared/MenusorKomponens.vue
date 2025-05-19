@@ -7,6 +7,7 @@
       <li><router-link to="/audit">Audit Panel</router-link></li>
       <li v-if="isAdmin"><router-link to="/admin">Admin</router-link></li>
     </ul>
+    <ErtesitesBell class="ertesites-ikon" />
     <div class="logout-container">
       <button class="logout-btn" @click="logout">Kijelentkezés</button>
     </div>
@@ -14,8 +15,12 @@
 </template>
 
 <script>
+import ErtesitesBell from '@/components/shared/ErtesitesBell.vue';
 export default {
   name: 'MenusorKomponens',
+  components: {
+      ErtesitesBell
+  },
   data() {
     return {
       isAdmin: false,
@@ -49,9 +54,9 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #222;
-  padding: 10px 20px;
-  color: #fff;
+  background-color: #1d2951; /* Sötétkék */
+  padding: 12px 24px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .menu {
@@ -63,35 +68,47 @@ export default {
 }
 
 .menu li {
-  font-size: 1em;
+  font-size: 1rem;
 }
 
 .menu li a {
-  color: #fff;
+  color: #f0f0f0;
   text-decoration: none;
-  transition: color 0.3s;
+  padding: 6px 12px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .menu li a:hover {
-  color: #f1c40f;
+  background-color: #34498e;
+  color: #ffffff;
 }
 
 .logout-container {
-  /* Biztosítja, hogy a kijelentkezés gomb megfelelően igazodik */
+  display: flex;
+  align-items: center;
 }
 
 .logout-btn {
-  background: transparent;
-  border: 1px solid #f1c40f;
-  color: #f1c40f;
-  padding: 6px 12px;
+  background-color: transparent;
+  border: 1px solid #fff;
+  color: #fff;
+  padding: 6px 14px;
   border-radius: 4px;
   cursor: pointer;
-  transition: background-color 0.3s, color 0.3s;
+  font-weight: bold;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .logout-btn:hover {
-  background-color: #f1c40f;
-  color: #222;
+  background-color: #ffffff;
+  color: #1d2951;
 }
+
+.ertesites-ikon {
+  position: absolute;
+  top: 25px;
+  right: 200px;
+}
+
 </style>
