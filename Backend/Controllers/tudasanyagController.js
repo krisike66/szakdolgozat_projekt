@@ -1,4 +1,3 @@
-// controllers/tudasanyagController.js
 const jwt = require('jsonwebtoken');
 const db = require('../Models');
 const Tudasanyag = db.tudasanyag;
@@ -6,7 +5,6 @@ const User = db.users;
 const Cimke = db.cimke;
 const Kategoria = db.kategoria;
 
-// Összes tudásanyag lekérése szerzővel és módosítóval
 const getAllTudasanyagok = async (req, res) => {
   try {
     const { kategoria_id, kereses } = req.query;
@@ -33,14 +31,12 @@ const getAllTudasanyagok = async (req, res) => {
       whereClause.audit_approved = true;
     }
 
-    // Itt építjük az include-ot dinamikusan
     const include = [
       { model: User, as: 'szerzo', attributes: ['user_id', 'felhasznalonev'] },
       { model: User, as: 'modosito', attributes: ['user_id', 'felhasznalonev'] },
       { model: Kategoria, as: 'kategoria', attributes: ['kategoria_id', 'nev'] }
     ];
 
-    // Ha címke szűrés van, azt külön adjuk hozzá
     if (cimke_ids.length > 0) {
       include.push({
         model: Cimke,
@@ -70,20 +66,15 @@ const getAllTudasanyagok = async (req, res) => {
 };
 
 
-
-// Új tudásanyag létrehozása
 const createTudasanyag = async (req, res) => {
   try {
-
-    console.log('BODY:', req.body);
-    console.log('FILE:', req.file);
     const token = req.headers.authorization?.split(' ')[1];
     if (!token) {
       return res.status(401).json({ error: 'Autentikáció szükséges' });
     }
 
     const decoded = jwt.verify(token, process.env.secretKey);
-    const userId = decoded.user_id;  // A tokenből kinyert user_id
+    const userId = decoded.user_id;
 
     const cim = req.body.cim;
     const tartalom = req.body.tartalom;
@@ -95,7 +86,6 @@ const createTudasanyag = async (req, res) => {
     }
 
     const filePath = req.file ? req.file.filename : null;
-    // Tudásanyag létrehozása
     const newTudasanyag = await Tudasanyag.create({
       cim,
       tartalom,
@@ -107,10 +97,7 @@ const createTudasanyag = async (req, res) => {
       audit_approved: false,
       file: filePath
     });
-
     console.log("Decoded token:", decoded);
-
-    // Címkék hozzáadása
     if (cimkek && cimkek.length > 0) {
       const cimkeObjektek = await Cimke.findAll({
         where: {
@@ -167,7 +154,6 @@ const deleteTudasanyag = async (req, res) => {
     return res.status(404).json({ error: 'Tudásanyag nem található' });
   }
 
-  // Csak admin, vagy aki létrehozta
   const isOwner = tudasanyag.letrehozva_altala === user.user_id;
   const isAdmin = user.role === 'admin';
 
@@ -217,7 +203,6 @@ const approveTudasanyag = async (req, res) => {
   res.json({ message: 'Jóváhagyva' });
 };
 
-
 const updateTudasanyag = async (req, res) => {
   try {
     const { id } = req.params;
@@ -248,12 +233,10 @@ const updateTudasanyag = async (req, res) => {
     }
 
     if (typeof cimkek === 'string') {
-      cimkek = [cimkek]; // ha csak egy van
+      cimkek = [cimkek]; 
     }
 
     const filePath = req.file ? req.file.filename : tudasanyag.file;
-
-    // Frissítés
     await tudasanyag.update({
       cim,
       tartalom,
@@ -261,19 +244,15 @@ const updateTudasanyag = async (req, res) => {
       file: filePath,
       modositva: new Date(),
       modositva_altala: user.user_id,
-      audit_approved: false,         // új módosítás → újra jóvá kell hagyni
+      audit_approved: false,
       approved_by: null
     });
-
-    // Címkék frissítése
     if (cimkek && Array.isArray(cimkek)) {
       const cimkeObjektek = await db.cimke.findAll({
         where: { cimke_id: cimkek }
       });
       await tudasanyag.setCimkek(cimkeObjektek);
     }
-
-    // Log
     await db.logs.create({
       user_id: user.user_id,
       action: `Tudásanyag módosítva: ${cim}`,
@@ -288,8 +267,7 @@ const updateTudasanyag = async (req, res) => {
 };
 
 
-const hasonlok = require('../hasonlok.json'); // statikus fájl
-
+const hasonlok = require('../hasonlok.json');
 const getHasonloTudasanyagok = async (req, res) => {
   const id = req.params.id;
 
@@ -303,10 +281,8 @@ const getHasonloTudasanyagok = async (req, res) => {
       where: {
         tudasanyag_id: lista.map(item => item.id)
       },
-      attributes: ['tudasanyag_id', 'cim'] // vagy több mező, ha kell
+      attributes: ['tudasanyag_id', 'cim'] 
     });
-
-    // eredmények sorrendbe rendezése az eredeti score lista alapján
     const rendezett = lista
       .map(item => {
         const match = eredmeny.find(e => e.tudasanyag_id === item.id);

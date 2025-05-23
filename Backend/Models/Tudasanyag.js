@@ -1,4 +1,3 @@
-// models/Tudasanyag.js
 module.exports = (sequelize, DataTypes) => {
   const Tudasanyag = sequelize.define('tudasanyag', {
     tudasanyag_id: {

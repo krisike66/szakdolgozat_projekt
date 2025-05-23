@@ -1,7 +1,6 @@
 <template>
   <div class="profile-page">
     <div class="layout">
-      <!-- Profil kártya -->
       <div class="profile-card">
         <h1>Profilom</h1>
         <div class="profile-info" v-if="user">
@@ -17,8 +16,6 @@
         </div>
         <button class="logout-btn" @click="logout">Kijelentkezés</button>
       </div>
-
-      <!-- Tudásanyag lista -->
       <div class="card-list-container">
         <h2>Általam létrehozott tudásanyagok</h2>
         <div

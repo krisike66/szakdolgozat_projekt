@@ -135,8 +135,11 @@ export default {
     },
     shortText(text) {
       if (!text) return '';
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = text;
+      const plainText = tempDiv.textContent || tempDiv.innerText || '';
       const maxLength = 120;
-      return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+      return plainText.length > maxLength ? plainText.substring(0, maxLength) + '...' : plainText;
     },
     formatDate(dateString) {
       const date = new Date(dateString);

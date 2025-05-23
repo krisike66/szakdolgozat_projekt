@@ -1,4 +1,3 @@
-// create-test-tudasanyag.js
 const db = require('./Models');
 const Tudasanyag = db.tudasanyag;
 

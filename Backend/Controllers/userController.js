@@ -2,7 +2,6 @@ const bcrypt = require("bcrypt");
 const db = require("../Models");
 const jwt = require("jsonwebtoken");
 
-// Adatbázisból a felhasználó modell
 const User = db.users;
 const Tudasanyag = db.tudasanyag;
 const Komment = db.komment;
@@ -16,7 +15,6 @@ const login = async (req, res) => {
     if (user) {
       const isSame = await bcrypt.compare(password, user.password_hash);
       if (isSame) {
-        // Token generálása a felhasználó ID és role alapján
         const token = jwt.sign(
           { user_id: user.user_id, role: user.role },
           process.env.secretKey,
@@ -27,8 +25,6 @@ const login = async (req, res) => {
           httpOnly: true,
           sameSite: "lax",
         });
-
-        // Válaszként küldjük a token-t és a user adatokat
         return res.status(201).json({ token, user });
       } else {
         return res.status(401).send("Authentication failed");
@@ -42,8 +38,6 @@ const login = async (req, res) => {
   }
 };
 
-
-
 const profile = async (req, res) => {
   try {
     const token = req.headers.authorization?.split(" ")[1];
@@ -52,7 +46,7 @@ const profile = async (req, res) => {
     }
 
     const decoded = jwt.verify(token, process.env.secretKey);
-    console.log("Decoded token:", decoded);  // Ellenőrizd, mit tartalmaz a token
+    console.log("Decoded token:", decoded);
 
     const user = await User.findByPk(decoded.user_id, {
       attributes: ["user_id", "felhasznalonev", "email", "role"],
@@ -89,11 +83,8 @@ const createUser = async (req, res) => {
   }
 };
 
-
-// Összes felhasználó lekérése
 const getUsers = async (req, res) => {
   try {
-    // Ha a ?sort=desc kerül megadásra, csökkenő rendezünk, egyébként növekvő
     const sortOrder = req.query.sort === 'desc' ? 'DESC' : 'ASC';
     const users = await User.findAll({
       order: [['user_id', sortOrder]]
@@ -105,7 +96,6 @@ const getUsers = async (req, res) => {
   }
 };
 
-// Felhasználó törlése
 const deleteUser = async (req, res) => {
   try {
     const userId = req.params.id;
@@ -121,7 +111,6 @@ const deleteUser = async (req, res) => {
   }
 };
 
-// (Opcionális) Felhasználó módosítása
 const updateUser = async (req, res) => {
   try {
     const { userName, email, role } = req.body;
@@ -130,7 +119,6 @@ const updateUser = async (req, res) => {
     if (!user) {
       return res.status(404).send({ error: "User not found" });
     }
-    // Frissítjük az adatokat
     user.felhasznalonev = userName;
     user.email = email;
     user.role = role;
@@ -141,7 +129,6 @@ const updateUser = async (req, res) => {
     res.status(500).send({ error: "Internal server error" });
   }
 };
-
 
 const getUserById = async (req, res) => {
   try {
@@ -159,8 +146,6 @@ const getUserById = async (req, res) => {
     res.status(500).send({ error: "Internal server error" });
   }
 };
-
-
 
 const getUserStats = async (req, res) => {
   try {

@@ -11,7 +11,6 @@ export default {
 </script>
 
 <style>
-/* Globális stílusok */
 * {
   margin: 0;
   padding: 0;

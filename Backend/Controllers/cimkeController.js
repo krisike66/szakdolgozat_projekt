@@ -1,9 +1,7 @@
-// Controllers/cimkeController.js
-
 const db = require('../Models');
 const Cimke = db.cimke;
 
-// Új címke létrehozása
+
 const createCimke = async (req, res) => {
   try {
     const { nev } = req.body;
@@ -15,7 +13,7 @@ const createCimke = async (req, res) => {
   }
 };
 
-// Összes címke lekérése
+
 const getAllCimkek = async (req, res) => {
   const { kategoria_id } = req.query;
 
@@ -31,7 +29,7 @@ const getAllCimkek = async (req, res) => {
   }
 };
 
-// Egy adott címke lekérése
+
 const getCimkeById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -46,7 +44,7 @@ const getCimkeById = async (req, res) => {
   }
 };
 
-// Címke törlése
+
 const deleteCimke = async (req, res) => {
   try {
     const { id } = req.params;

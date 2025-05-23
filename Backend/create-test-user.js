@@ -5,7 +5,7 @@ async function createTestUser() {
   try {
     const hashedPassword = await bcrypt.hash("admin", 10);
     const newUser = await db.users.create({
-      felhasznalonev: 'admin',  // győződj meg róla, hogy a mező neve egyezik az adatbázisban használt névvel
+      felhasznalonev: 'admin',
       email: 'admin@test.com',
       password_hash: hashedPassword,
       role: 'admin'

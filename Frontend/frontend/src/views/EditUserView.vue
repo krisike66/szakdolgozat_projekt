@@ -48,7 +48,6 @@
         try {
           const response = await api.get(`/users/${this.userId}`, { withCredentials: true });
           const user = response.data;
-          // Győződj meg róla, hogy a megfelelő mezőneveket használod (pl.: felhasznalonev vagy userName)
           this.userName = user.felhasznalonev || user.userName;
           this.email = user.email;
           this.role = user.role;
@@ -66,8 +65,6 @@
             email: this.email,
             role: this.role
           }, { withCredentials: true });
-
-          // ✅ Logolás – frissítés után
           await api.post('/logs', {
             action: `Felhasználó módosítva: ${this.userName} (ID=${this.userId})`
           }, { withCredentials: true });

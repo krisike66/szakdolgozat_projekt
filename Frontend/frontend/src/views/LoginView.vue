@@ -46,11 +46,9 @@ export default {
           password: this.password
         });
         console.log('Bejelentkezés sikeres:', response.data);
-        // Token tárolása, ha szükséges:
         if (response.data.token) {
           localStorage.setItem('userToken', response.data.token);
         }
-        // Átirányítás a főoldalra:
         this.$router.push('/home');
       } catch (error) {
         console.error('Bejelentkezési hiba:', error);

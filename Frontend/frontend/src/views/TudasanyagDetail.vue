@@ -10,7 +10,7 @@
       </p>
     </div>
     <div class="content">
-      <p>{{ tudasanyag.tartalom }}</p>
+      <div v-html="tudasanyag.tartalom" class="content-html"></div>
     </div>
     <div v-if="tudasanyag.file" class="letoltes">
       <p><strong>Csatolt fájl:</strong></p>
@@ -33,10 +33,6 @@
         >Jóváhagyás</button>
     </div>
   </div>
-
-
-
-  <!-- Kommentek és értékelés szekció -->
 <div class="komment-ertekeles-szekcio">
   <h2>Értékelés</h2>
   <div class="csillagok">
@@ -265,7 +261,7 @@ export default {
           headers: { Authorization: `Bearer ${token}` }
         });
         alert("Sikeresen jóváhagyva!");
-        this.fetchTudasanyag(); // Frissítés
+        this.fetchTudasanyag();
       } catch (error) {
         console.error("Jóváhagyás hiba:", error);
         alert("Hiba történt a jóváhagyás során.");
@@ -518,4 +514,10 @@ export default {
   text-decoration: underline;
 }
 
+
+.content-html {
+  font-size: 1.1em;
+  line-height: 1.6em;
+  color: #333;
+}
 </style>

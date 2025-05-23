@@ -9,7 +9,12 @@
 
       <div class="form-group">
         <label for="content">Tartalom</label>
-        <textarea id="content" v-model="content" rows="5" required placeholder="Írd be a tudásanyagot..."></textarea>
+          <QuillEditor
+            v-model:content="content"
+            content-type="html"
+            theme="snow"
+            style="height: 300px;"
+          />
       </div>
 
       <div class="form-group">
@@ -46,8 +51,11 @@
 
 <script>
 import api from '../api';
-
+import { QuillEditor } from '@vueup/vue-quill';
 export default {
+  components: {
+    QuillEditor
+  },
   data() {
     return {
       title: '',
@@ -103,11 +111,11 @@ export default {
         formData.append('kategoria_id', selectedKategoria.kategoria_id);
 
         if (this.file) {
-          formData.append('file', this.file); // ⬅️ fájl hozzáadása
+          formData.append('file', this.file);
         }
 
         this.selectedCimkek.forEach(cimkeId => {
-          formData.append('cimkek[]', cimkeId); // Több címke
+          formData.append('cimkek[]', cimkeId);
         });
 
         const headers = {

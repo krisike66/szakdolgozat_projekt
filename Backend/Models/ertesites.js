@@ -1,4 +1,3 @@
-// Models/ertesites.js
 module.exports = (sequelize, DataTypes) => {
   const Ertesites = sequelize.define('ertesites', {
     id: {

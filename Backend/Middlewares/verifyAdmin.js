@@ -11,7 +11,7 @@ const verifyAdmin = (req, res, next) => {
     if (decoded.role !== "admin") {
       return res.status(403).send({ error: "Forbidden: Admins only" });
     }
-    req.user = decoded; // opcionálisan átadhatod a további feldolgozáshoz
+    req.user = decoded;
     next();
   } catch (err) {
     console.error(err);

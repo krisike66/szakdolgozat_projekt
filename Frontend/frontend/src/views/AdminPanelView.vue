@@ -1,8 +1,6 @@
 <template>
     <div class="admin-panel">
       <h1>Admin Panel</h1>
-      
-      <!-- Felhasználó létrehozó űrlap -->
       <div class="create-user-form">
         <form @submit.prevent="onSubmit">
           <div class="form-group">
@@ -30,8 +28,6 @@
         <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
         <p v-if="successMessage" class="success">{{ successMessage }}</p>
       </div>
-  
-      <!-- Felhasználók lista -->
       <div class="user-list-container">
         <div class="user-list-header">
           <div class="header-item">
@@ -60,9 +56,6 @@
         </div>
       </div>
     </div>
-
-
-    <!-- Log lista -->
     <div class="log-list">
       <h2>Rendszerlogok</h2>
         <ul>
@@ -117,7 +110,6 @@
             withCredentials: true
           });
           this.successMessage = 'Felhasználó sikeresen létrehozva!';
-          // Űrlap ürítése
           this.userName = '';
           this.email = '';
           this.password = '';
@@ -140,7 +132,7 @@
       async fetchLogs() {
         try {
           const response = await api.get('/logs', { withCredentials: true });
-          console.log("Log válasz:", response.data); // ← Nézd meg a struktúrát
+          console.log("Log válasz:", response.data);
           this.logs = response.data;
         } catch (error) {
           console.error('Logok lekérése hiba:', error);
@@ -178,7 +170,7 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
   
-  /* Létrehozó űrlap stílusok */
+
   .create-user-form {
     background-color: #fff;
     border: 1px solid #ddd;
@@ -207,7 +199,7 @@
     font-size: 1rem;
   }
   
-  /* Gombok */
+
   button {
     padding: 10px 20px;
     background-color: #007bff;
@@ -231,7 +223,7 @@
     margin-left: 5px;
   }
   
-  /* Üzenetek */
+
   .error {
     color: #d9534f;
     margin-top: 10px;
@@ -242,7 +234,7 @@
     margin-top: 10px;
   }
   
-  /* Felhasználók lista */
+ 
   .user-list-container {
     margin-top: 30px;
   }

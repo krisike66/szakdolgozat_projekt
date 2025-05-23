@@ -25,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
     indexes: [
       {
         unique: true,
-        fields: ['user_id', 'tudasanyag_id']  // ⬅️ ez az upsert kulcsa
+        fields: ['user_id', 'tudasanyag_id']
       }
     ]
   });

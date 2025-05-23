@@ -11,7 +11,6 @@ import EditUserView from '../views/EditUserView.vue';
 import DashboardLayout from '../layouts/DashboardLayout.vue';
 
 const routes = [
-    // Nyilvános útvonalak
     {
       path: '/',
       redirect: '/login',
@@ -21,8 +20,6 @@ const routes = [
       name: 'login',
       component: LoginView,
     },
-
-    // Autentikált útvonalak (DashboardLayout használatával)
     {
       path: '/',
       component: DashboardLayout,
@@ -91,11 +88,9 @@ const router = createRouter({
   routes,
 });
 
-// Globális router guard a hitelesítéshez és az admin ellenőrzéshez
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('userToken');
 
-  // Admin jogot igénylő útvonalak
   if (to.meta.requiresAdmin) {
     if (!token) {
       return next({ path: '/login' });
@@ -112,21 +107,19 @@ router.beforeEach((to, from, next) => {
     }
   }
   
-  // Általános hitelesítést igénylő útvonalak
+  
   if (to.meta.requiresAuth) {
     if (!token) {
       return next({ path: '/login' });
     }
     try {
-      jwtDecode(token);  // Validáljuk a tokent
+      jwtDecode(token);
       return next();
     } catch (error) {
       console.error('Token decode error:', error);
       return next({ path: '/login' });
     }
   }
-  
-  // Ha nem igényel hitelesítést, engedjük tovább
   return next();
 });
 

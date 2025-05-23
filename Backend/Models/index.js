@@ -1,7 +1,5 @@
-// Models/index.js
 const { Sequelize, DataTypes } = require('sequelize');
 
-// Database connection
 const sequelize = new Sequelize(`postgres://admin:Krisike66@localhost:5432/db_tudasbazis`, { dialect: "postgres" });
 
 sequelize.authenticate()
@@ -12,7 +10,6 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
-// Import models
 db.users = require('./userModel')(sequelize, DataTypes);
 db.cimke = require('./Cimke')(sequelize, DataTypes);
 db.tudasanyag = require('./Tudasanyag')(sequelize, DataTypes);
@@ -24,13 +21,13 @@ db.ertekeles = require('./ertekelesModel')(sequelize, DataTypes);
 db.ertesites = require('./ertesites')(sequelize, DataTypes);
 
 
-// Define associations
+
 Object.keys(db).forEach((modelName) => {
   if (db[modelName].associate) {
     db[modelName].associate(db);
   }
 });
-// Szerző kapcsolat
+
 db.tudasanyag.belongsTo(db.users, {
   foreignKey: 'letrehozva_altala',
   as: 'szerzo',
@@ -41,7 +38,7 @@ db.users.hasMany(db.tudasanyag, {
   as: 'letrehozottTudasanyagok'
 });
 
-// Módosító kapcsolat
+
 db.tudasanyag.belongsTo(db.users, {
   foreignKey: 'modositva_altala',
   as: 'modosito',
@@ -52,7 +49,7 @@ db.users.hasMany(db.tudasanyag, {
   as: 'modositottTudasanyagok'
 });
 
-// Címke kapcsolat (Many-to-Many)
+
 db.tudasanyag.belongsToMany(db.cimke, {
   through: {
     model: 'tudasanyag_cimke',
@@ -86,7 +83,7 @@ db.tudasanyag.belongsTo(db.kategoria, {
 
 db.logs.belongsTo(db.users, { foreignKey: 'user_id' });
 
-// Komment kapcsolatok
+
 db.komment.belongsTo(db.tudasanyag, {
   foreignKey: 'tudasanyag_id'
 });
@@ -95,7 +92,6 @@ db.komment.belongsTo(db.users, {
 });
 
 
-// Értékelés kapcsolatok
 db.tudasanyag.hasMany(db.ertekeles, {
   foreignKey: 'tudasanyag_id',
   onDelete: 'CASCADE'
@@ -108,8 +104,4 @@ db.ertekeles.belongsTo(db.users, {
   foreignKey: 'user_id'
 });
 
-
-
-
-// Attach models to db object
 module.exports = db;

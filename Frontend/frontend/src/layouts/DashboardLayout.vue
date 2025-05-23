@@ -1,16 +1,13 @@
 <template>
   <div class="dashboard-layout">
-    <!-- Fejléc -->
     <header class="fejlec">
       <MenusorKomponens />
     </header>
 
-    <!-- Tartalom -->
     <main class="fo-tartalom">
       <router-view />
     </main>
 
-    <!-- Lábléc -->
     <footer class="lablec">
       <LablecKomponens />
     </footer>

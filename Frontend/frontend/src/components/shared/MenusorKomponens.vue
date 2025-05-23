@@ -54,7 +54,7 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #1d2951; /* Sötétkék */
+  background-color: #1d2951;
   padding: 12px 24px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }

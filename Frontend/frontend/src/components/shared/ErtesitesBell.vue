@@ -28,7 +28,7 @@ export default {
   },
   mounted() {
     this.fetchErtesitesek();
-    setInterval(this.fetchErtesitesek, 60000); // 30 mp-enként frissít
+    setInterval(this.fetchErtesitesek, 60000);
   },
   computed: {
     unreadCount() {
@@ -61,7 +61,6 @@ export default {
         await api.patch("/ertesitesek/read/all", null, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        // Ezután újra lekérjük a friss állapotot
         await this.fetchErtesitesek();
       } catch (error) {
         console.error("Olvasottra állítás hiba:", error);

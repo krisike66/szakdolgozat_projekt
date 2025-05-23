@@ -1,4 +1,3 @@
-// Models/Cimke.js
 module.exports = (sequelize, DataTypes) => {
     const Cimke = sequelize.define('Cimke', {
         cimke_id: {

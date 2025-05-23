@@ -2,7 +2,7 @@ const db = require("../Models");
 const Ertesites = db.ertesites;
 const jwt = require("jsonwebtoken");
 
-// Egy felhasználó összes értesítése
+
 exports.getErtesitesekByUser = async (req, res) => {
   try {
     const token = req.headers.authorization?.split(" ")[1];
@@ -23,7 +23,7 @@ exports.getErtesitesekByUser = async (req, res) => {
   }
 };
 
-// Új értesítés létrehozása
+
 exports.createErtesites = async (req, res) => {
   try {
     const { user_id, tipus, uzenet } = req.body;
@@ -41,7 +41,7 @@ exports.createErtesites = async (req, res) => {
   }
 };
 
-// Egy értesítés olvasottá tétele
+
 exports.markAsRead = async (req, res) => {
   try {
     const id = req.params.id;
@@ -56,7 +56,7 @@ exports.markAsRead = async (req, res) => {
   }
 };
 
-// Összes értesítés olvasottra állítása
+
 exports.markAllAsRead = async (req, res) => {
   try {
     const token = req.headers.authorization?.split(" ")[1];

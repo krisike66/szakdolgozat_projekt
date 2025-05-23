@@ -1,5 +1,3 @@
-// Models/Kategoria.js
-
 module.exports = (sequelize, DataTypes) => {
   const Kategoria = sequelize.define('Kategoria', {
     kategoria_id: {

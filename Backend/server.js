@@ -13,25 +13,21 @@ const PORT = process.env.PORT || 3000;
 const app = express();
 const path = require('path');
 
-// Middleware-ek
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// CORS beállítás (frontend: 8081)
 app.use(cors({
   origin: 'http://localhost:8081',
   credentials: true,
 }));
 
-// Adatbázis szinkronizálása
 db.sequelize.sync({ alter: true }).then(() => {
     console.log("db has been re sync");
 });
 
-// Route-ok
 app.use('/api/users', userRoutes);
 app.use('/api/tudasanyagok', tudasanyagRoutes);
 app.use('/api/cimkek', cimkeRoutes);
@@ -39,7 +35,5 @@ app.use('/api/kategoriak', kategoriakRoutes);
 app.use('/api', require('./Routes1/logsRoutes'));
 app.use('/api', require('./Routes1/kommentErtekelesRoutes'));
 app.use('/api/ertesitesek', ertesitesRoutes);
-
-
 
 app.listen(PORT, () => console.log(`Server is connected on ${PORT}`));

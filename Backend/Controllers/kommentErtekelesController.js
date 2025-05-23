@@ -1,10 +1,8 @@
 const db = require('../Models');
 const jwt = require('jsonwebtoken');
-
 const Komment = db.komment;
 const Ertekeles = db.ertekeles;
 
-// Új komment létrehozása
 exports.addKomment = async (req, res) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
@@ -38,7 +36,6 @@ exports.addKomment = async (req, res) => {
   }
 };
 
-// Tudásanyaghoz tartozó kommentek lekérdezése
 exports.getKommentekByTudasanyag = async (req, res) => {
   try {
     const kommentek = await Komment.findAll({
@@ -54,7 +51,6 @@ exports.getKommentekByTudasanyag = async (req, res) => {
   }
 };
 
-// Új értékelés mentése vagy frissítése
 exports.addOrUpdateErtekeles = async (req, res) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
@@ -86,22 +82,18 @@ exports.addOrUpdateErtekeles = async (req, res) => {
   }
 };
 
-
-// Tudásanyag átlagértékelésének lekérdezése
 exports.getErtekelesAtlag = async (req, res) => {
   try {
     const result = await Ertekeles.findAll({
       where: { tudasanyag_id: req.params.id },
       attributes: [[db.Sequelize.fn('AVG', db.Sequelize.col('ertekeles')), 'atlag']]
     });
-
     res.json(result[0]);
   } catch (err) {
     console.error("Hiba értékelés átlag lekérdezésénél:", err);
     res.status(500).json({ error: 'Belső hiba' });
   }
 };
-
 
 exports.getUserRating = async (req, res) => {
   const { tudasanyag_id } = req.params;
@@ -161,5 +153,3 @@ exports.getTopRatedTudasanyagok = async (req, res) => {
     res.status(500).json({ error: "Belső hiba" });
   }
 };
-
-
