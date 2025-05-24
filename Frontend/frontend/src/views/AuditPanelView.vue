@@ -11,7 +11,7 @@
         <h3>{{ shortText(tudas.cim) }}</h3>
         <p><strong>Kategória:</strong> {{ tudas.kategoria?.nev || 'Nincs kategória' }}</p>
         <p><strong>Szerző:</strong> {{ tudas.szerzo?.felhasznalonev || 'Ismeretlen' }}</p>
-        <p class="tartalom-preview"><strong>Tartalom:</strong> {{ shortText(tudas.tartalom) }}</p>
+        <p class="tartalom-preview"><strong>Tartalom:</strong> <span v-html="shortHTML(tudas.tartalom)"></span></p>
 
         <div class="gombok">
           <button @click="goToEdit(tudas.tudasanyag_id)" class="edit-btn">Szerkesztés</button>
@@ -40,6 +40,12 @@ export default {
     this.fetchTudasanyagok();
   },
   methods: {
+    shortHTML(html) {
+      const div = document.createElement('div');
+      div.innerHTML = html;
+      const text = div.innerText;
+      return text.length > 200 ? text.substring(0, 200) + '...' : text;
+    },
     async fetchTudasanyagok() {
       try {
         const response = await api.get('/tudasanyagok', {
